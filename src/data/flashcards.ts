@@ -417,4 +417,42 @@ export const FLASHCARDS: Flashcard[] = [
     tags: ['Cirúrgica', 'Segurança'],
     requiredLessonId: 'l_surgical'
   }
+    answer: '35 a 45 mmHg. Acima disso indica acidose respiratória.',
+    requiredLessonId: 'l_gaso'
+  },
+  {
+    id: 'f-gaso-1',
+    moduleId: 'c1',
+    question: 'Qual o valor de referência do HCO3 na gasometria?',
+    answer: '22 a 26 mEq/L. Representa o componente metabólico (renal).',
+    requiredLessonId: 'l_gaso'
+  },
+  {
+    id: 'f-iam-1',
+    moduleId: 'c1',
+    question: 'O que significa a sigla MONA no atendimento ao IAM?',
+    answer: 'Morfina, Oxigênio, Nitrato e AAS (Antiagregante).',
+    requiredLessonId: 'l_iam'
+  },
+  {
+    id: 'f-iam-2',
+    moduleId: 'c1',
+    question: 'Qual o tempo máximo recomendado para realizar o ECG na dor torácica?',
+    answer: 'Até 10 minutos após a entrada no serviço de emergência.',
+    requiredLessonId: 'l_iam'
+  },
+  {
+    id: 'f-hpp-1',
+    moduleId: 'w1',
+    question: 'Quais são os "4 Ts" da Hemorragia Pós-parto?',
+    answer: 'Tônus, Trauma, Tecido e Trombina.',
+    requiredLessonId: 'l_hem_pos'
+  },
+  {
+    id: 'f-hpp-2',
+    moduleId: 'w1',
+    question: 'Qual a causa mais comum de HPP?',
+    answer: 'Atonia Uterina (Problema no Tônus). Corresponde a 70% dos casos.',
+    requiredLessonId: 'l_hem_pos'
+  }
 ];

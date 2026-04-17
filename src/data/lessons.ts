@@ -1078,4 +1078,125 @@ Focar na preservação da autonomia, prevenção de quedas, controle rigoroso da
       { id: 'qger_5', question: 'Promover a autonomia no idoso significa:', options: ['Fazer tudo por ele', 'Incentivar que ele realize suas atividades dentro de suas capacidades', 'Ignorar o idoso', 'Deixar ele sozinho na rua'], correctAnswerIndex: 1 }
     ]
   }
+    ]
+  },
+  {
+    id: 'l_gaso',
+    moduleId: 'c1',
+    title: 'Interpretação de Gasometria Arterial',
+    order: 6,
+    content: `
+# Gasometria Arterial na Prática
+
+Avaliação essencial do equilíbrio ácido-base e da oxigenação pulmonar.
+
+## Valores de Referência
+- **pH:** 7,35 - 7,45 (Abaixo = Acidose | Acima = Alcalose)
+- **pCO2:** 35 - 45 mmHg (Reflete o pulmão/respiratório)
+- **HCO3:** 22 - 26 mEq/L (Reflete o metabolismo/rim)
+- **pO2:** 80 - 100 mmHg
+
+## Os 3 Passos da Interpretação
+1. **Olhe o pH:** Determine se é acidose ou alcalose.
+2. **Olhe a pCO2:** Se for oposto ao pH (ex: pH baixo e CO2 alto), o problema é **Respiratório**.
+3. **Olhe o HCO3:** Se for no mesmo sentido do pH (ex: pH baixo e HCO3 baixo), o problema é **Metabólico**.
+`,
+    questions: [
+      { id: 'qgas_1', question: 'Um pH de 7.25 indica qual estado do paciente?', options: ['Alcalose', 'Normalidade', 'Acidose', 'Hiperóxia'], correctAnswerIndex: 2 },
+      { id: 'qgas_2', question: 'Qual parâmetro gasométrico avalia o pulmao/ventilação?', options: ['pH', 'pCO2', 'HCO3', 'Sódio'], correctAnswerIndex: 1 },
+      { id: 'qgas_3', question: 'HCO3 baixo e pH baixo sugerem:', options: ['Alcalose Respiratória', 'Acidose Metabólica', 'Acidose Respiratória', 'Normalidade'], correctAnswerIndex: 1 },
+      { id: 'qgas_4', question: 'Qual a faixa de normalidade do pH sanguíneo arterial?', options: ['7.00 - 7.10', '7.45 - 7.55', '7.35 - 7.45', '6.80 - 7.00'], correctAnswerIndex: 2 },
+      { id: 'qgas_5', question: 'Vômitos frequentes podem levar a perda de H+ e causar:', options: ['Acidose Respiratória', 'Alcalose Metabólica', 'Insuficiência Renal', 'Hipercapnia'], correctAnswerIndex: 1 }
+    ]
+  },
+  {
+    id: 'l_iam',
+    moduleId: 'c1',
+    title: 'Infarto Agudo do Miocárdio (Protocolo)',
+    order: 7,
+    content: `
+# Atendimento ao IAM (Dor Torácica)
+
+A enfermagem é a linha de frente na identificação e manejo inicial da síndrome coronariana aguda.
+
+## Sinais de Alerta
+- Dor retroesternal em aperto, irradiação para braço esquerdo/mandíbula.
+- Náuseas, sudorese fria e dispneia.
+
+## Protocolo Clássico (MONA)
+- **Morfina:** Alívio da dor e redução da pré-carga (se necessário).
+- **Oxigênio:** Se SatO2 < 90% ou dispneia.
+- **Nitrato:** Isordil (sublingual) para vasodilatação (Cuidado com PA baixa).
+- **AAS:** Mastigar 200-300mg para efeito antiagregante imediato.
+
+O ECG deve ser realizado e interpretado em até **10 minutos** da chegada!
+`,
+    questions: [
+      { id: 'qiam_1', question: 'Qual o tempo porta-ECG recomendado para suspeita de IAM?', options: ['1 hora', '30 minutos', '10 minutos', '2 horas'], correctAnswerIndex: 2 },
+      { id: 'qiam_2', question: 'O que significa a letra A no protocolo MONA?', options: ['Adrenalina', 'AAS (Ácido Acetilsalicílico)', 'Atropina', 'Amoxicilina'], correctAnswerIndex: 1 },
+      { id: 'qiam_3', question: 'Por que o AAS deve ser mastigado no IAM?', options: ['É gostoso', 'Melhora o hálito', 'Acelera a absorção e efeito antiagregante', 'Evita dor de estômago'], correctAnswerIndex: 2 },
+      { id: 'qiam_4', question: 'Paciente com dor torácica e PA de 80/50 mmHg. Pode usar Nitrato?', options: ['Sim, para abaixar mais', 'Não, pois o nitrato é vasodilatador e pode causar choque', 'Sim, dose dobrada', 'Nitrato não afeta a PA'], correctAnswerIndex: 1 },
+      { id: 'qiam_5', question: 'Qual a principal característica da dor isquêmica cardíaca?', options: ['Pontada que piora ao respirar', 'Queimação na pele', 'Aperto ou opressão retroesternal', 'Coceira'], correctAnswerIndex: 2 }
+    ]
+  },
+  {
+    id: 'l_hem_pos',
+    moduleId: 'w1',
+    title: 'Manejo de Hemorragia Pós-Parto (HPP)',
+    order: 2,
+    content: `
+# Hemorragia Pós-Parto (HPP)
+
+A HPP é a principal causa de morte materna evitável no mundo.
+
+## Os 4 Ts da HPP
+1. **Tônus (Atonia Uterina):** Causa mais comum (70%). Utero não contrai.
+2. **Trauma:** Lacerações de canal de parto ou inversão uterina.
+3. **Tecido:** Restos placentários.
+4. **Trombina:** Distúrbios de coagulação.
+
+## Manejo de Emergência
+- Massagem uterina bimanual (Hamilton).
+- Administração de Ocitocina e Ácido Tranexâmico.
+- Garantir dois acessos calibrosos.
+`,
+    questions: [
+      { id: 'qhpp_1', question: 'Qual a principal causa (os 4 Ts) de Hemorragia Pós-parto?', options: ['Trauma', 'Tônus (Atonia Uterina)', 'Tecido', 'Trombina'], correctAnswerIndex: 1 },
+      { id: 'qhpp_2', question: 'Qual o medicamento de primeira escolha na prevenção e tratamento da atonia?', options: ['Adrenalina', 'Ocitocina', 'Insulina', 'Penicilina'], correctAnswerIndex: 1 },
+      { id: 'qhpp_3', question: 'A manobra de massagem uterina bimanual é conhecida como:', options: ['Leopold', 'Kristeller (Proibida)', 'Hamilton', 'McRoberts'], correctAnswerIndex: 2 },
+      { id: 'qhpp_4', question: 'O que a enfermagem deve priorizar na hemorragia ativa?', options: ['Apenas pesar a paciente', 'Garantir acessos calibrosos, infusão de fluidos e monitorização', 'Pedir silêncio', 'Fazer um curativo no dedo'], correctAnswerIndex: 1 },
+      { id: 'qhpp_5', question: 'O uso de Ácido Tranexâmico serve para:', options: ['Aumentar o leite', 'Ajudar na coagulação e reduzir sangramento', 'Causar sono', 'Nada'], correctAnswerIndex: 1 }
+    ]
+  }
+    ]
+  },
+  {
+    id: 'l_hoch',
+    moduleId: 'f1',
+    title: 'Técnica de Injeção: Hochstetter',
+    order: 4,
+    content: `
+# Injeção Ventro-Glútea (Hochstetter)
+
+Considerada a via mais segura para administração intramuscular em adultos e crianças a partir de 7 anos.
+
+## Vantagens
+- Livre de grandes vasos e nervos importantes (longe do nervo ciático).
+- Menor espessura de tecido adiposo.
+- Grande massa muscular para absorção.
+
+## Localização
+1. Colocar a palma da mão sobre o grande trocanter do fêmur.
+2. Apontar o dedo indicador para a espinha ilíaca anterossuperior.
+3. Abrir o dedo médio ao longo da crista ilíaca, formando um **V**.
+4. O local da injeção é no centro deste **V**.
+`,
+    questions: [
+      { id: 'qhoch_1', question: 'Qual a principal vantagem da região ventro-glútea (Hochstetter)?', options: ['Dói mais', 'É mais fácil de ver', 'Distância segura de grandes vasos e do nervo ciático', 'Pode usar qualquer técnica'], correctAnswerIndex: 2 },
+      { id: 'qhoch_2', question: 'Para localizar o ponto de injeção, qual o formato formado pelos dedos indicador e médio?', options: ['Círculo', 'Quadrado', 'Letra V', 'Letra X'], correctAnswerIndex: 2 },
+      { id: 'qhoch_3', question: 'Sobre qual estrutura óssea deve ser colocada a palma da mão?', options: ['Joelho', 'Grande trocanter do fêmur', 'Patela', 'Clavícula'], correctAnswerIndex: 1 },
+      { id: 'qhoch_4', question: 'A técnica de Hochstetter foca em qual região muscular?', options: ['Deltóide', 'Vasto lateral', 'Ventro-glútea', 'Dorso-glútea'], correctAnswerIndex: 2 },
+      { id: 'qhoch_5', question: 'O dedo indicador aponta para qual estrutura na localização?', options: ['Umbigo', 'Pé', 'Espinha ilíaca anterossuperior', 'Escápula'], correctAnswerIndex: 2 }
+    ]
+  }
 ];

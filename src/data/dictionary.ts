@@ -35,6 +35,43 @@ export const DICTIONARY: DictionaryEntry[] = [
     howToMeasure: 'Baseia-se em parâmetros vitais: PA Sistólica, FC, FR, Temperatura e Escala de Coma de Glasgow/AVPU.',
     requiredLevel: 3
   }
+    requiredLevel: 3
+  },
+  {
+    term: 'Cincinnati',
+    definition: 'Escala de triagem pré-hospitalar para AVC.',
+    category: 'escala',
+    whatIs: 'Utilizada para identificar rapidamente sinais de acidente vascular cerebral.',
+    howToMeasure: 'Avalia: Sorriso (queda facial), Abraço (queda do braço) e Música (fala arrastada).',
+    requiredLessonId: 'l_avc'
+  },
+  {
+    term: 'NEWS',
+    definition: 'National Early Warning Score.',
+    category: 'escala',
+    whatIs: 'Sistema de pontuação para determinar a gravidade do paciente e a urgência da resposta clínica.',
+    howToMeasure: 'Avalia FR, SatO2, Suporte de O2, PA Sistólica, FC, Nível de Consciência e Temperatura.',
+    requiredLevel: 4
+  },
+  {
+    term: 'Melena',
+    definition: 'Fezes pretas e com odor fétido (sangue digerido).',
+    category: 'sigla',
+    details: 'Indica geralmente sangramento no trato gastrointestinal superior (HDA).'
+  },
+  {
+    term: 'Enterorragia',
+    definition: 'Eliminação de sangue vivo pelo ânus.',
+    category: 'sigla',
+    details: 'Indica geralmente sangramento no trato gastrointestinal inferior (HDB).'
+  },
+  {
+    term: 'Manobra de Hamilton',
+    definition: 'Massagem uterina bimanual.',
+    category: 'sigla',
+    details: 'Realizada em emergências de hemorragia pós-parto para estimular a contração do útero.',
+    requiredLessonId: 'l_hem_pos'
+  }
 ];
 
 // Mantendo SCALES para compatibilidade se necessário, mas unificando no DICTIONARY

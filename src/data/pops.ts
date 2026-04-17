@@ -44,4 +44,44 @@ export const POPS: POP[] = [
     ],
     requiredLevel: 3
   }
+    requiredLevel: 3
+  },
+  {
+    id: 'pop3',
+    title: 'Aspiração de Tubo Orotraqueal (TOT)',
+    description: 'Remoção de secreções da árvore traqueobrônquica em pacientes ventilados.',
+    category: 'Procedimentos',
+    objective: 'Manter a patência das vias aéreas e prevenir pneumonia associada à ventilação (PAV).',
+    materials: ['Sonda de aspiração', 'Luva estéril', 'Água destilada', 'Sistema de vácuo', 'Ambú'],
+    steps: [
+      { text: 'Pre-oxigenar o paciente a 100% de O2.', rationale: 'Prevenir hipoxemia durante a manobra.' },
+      { text: 'Calçar luva estéril na mão dominante.', rationale: 'Garantir técnica asséptica e evitar PAV.' },
+      { text: 'Introduzir a sonda sem aspirar.', rationale: 'Evitar trauma na mucosa traqueal.' },
+      { text: 'Aspirar por no máximo 10-15 segundos com movimentos rotatórios.', rationale: 'Reduzir risco de atelectasias e hipóxia.' }
+    ],
+    precautions: [
+      'Monitorar FC e SatO2 durante todo o processo.',
+      'Sempre aspirar a boca APÓS o tubo, nunca o contrário com a mesma sonda.'
+    ],
+    requiredLevel: 4
+  },
+  {
+    id: 'pop4',
+    title: 'Injeção Intramuscular (Ventro-Glútea)',
+    description: 'Técnica de Hochstetter para administração de medicamentos.',
+    category: 'Procedimentos',
+    objective: 'Administração segura em massa muscular profunda com baixo risco de complicações.',
+    materials: ['Seringa graduada', 'Agulha 30x7 ou 25x7', 'Algodão com álcool 70%', 'Luva de procedimento'],
+    steps: [
+      { text: 'Localizar o ponto formando um V entre os dedos indicador e médio.', rationale: 'Isolar a zona segura de nervos e vasos.' },
+      { text: 'Realizar antissepsia em movimento único ou circular.', rationale: 'Reduzir risco de abscesso.' },
+      { text: 'Introduzir a agulha em 90° e aspirar.', rationale: 'Conferir se não houve punção acidental de vaso.' },
+      { text: 'Injetar lentamente e retirar a agulha.', rationale: 'Melhorar a absorção e reduzir a dor.' }
+    ],
+    precautions: [
+      'Não realizar massagem após a injeção.',
+      'Indicado para volumes de até 5ml em adultos.'
+    ],
+    requiredLessonId: 'l_hoch'
+  }
 ];

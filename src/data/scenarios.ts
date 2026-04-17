@@ -163,4 +163,165 @@ export const SCENARIOS: Scenario[] = [
       }
     ]
   }
+    ]
+  },
+  {
+    id: 's-iam-1',
+    title: 'Protocolo de Dor Torácica (IAM)',
+    description: 'Paciente masculino, 55 anos, chega à emergência com dor esmagadora no peito e sudorese.',
+    difficulty: 'Alta',
+    xpReward: 350,
+    requiredLessonId: 'l_iam',
+    steps: [
+      {
+        id: 'iam_1',
+        description: 'Paciente está pálido e ansioso. Qual sua primeira ação?',
+        options: [
+          'Pedir para o paciente esperar sentado',
+          'Colocar em repouso absoluto, monitorizar e realizar o ECG em < 10min',
+          'Dar um copo de água e pedir exames de rotina',
+          'Ligar para a família primeiro'
+        ],
+        correctAnswerIndex: 1,
+        successMessage: 'Excelente! No IAM, "Tempo é Músculo". O ECG precoce é fundamental.',
+        failureMessage: 'Tempo é músculo! O ECG deve ser feito em menos de 10 minutos.'
+      },
+      {
+        id: 'iam_2',
+        description: 'O ECG confirma IAM com supra de ST. O médico prescreve o protocolo MONA. Qual destes você aplica imediatamente para efeito antiagregante?',
+        options: [
+          'Morfina',
+          'Insulina',
+          'AAS 200mg mastigável',
+          'Dipirona'
+        ],
+        correctAnswerIndex: 2,
+        successMessage: 'Correto! O AAS mastigável acelera a inibição plaquetária.',
+        failureMessage: 'O AAS é a pedra angular inicial para evitar que o coágulo aumente.'
+      },
+      {
+        id: 'iam_3',
+        description: 'O paciente apresenta PA 85/50 mmHg. Qual cuidado é CRÍTICO agora?',
+        options: [
+          'Administrar Nitrato sublingual',
+          'Não administrar Nitratos devido ao risco de choque/hipotensão grave',
+          'Pedir para o paciente caminhar para o centro cirúrgico',
+          'Fazer massagem cardíaca'
+        ],
+        correctAnswerIndex: 1,
+        successMessage: 'Perfeito! Nitratos são contraindicados em pacientes hipotensos ou com infarto de ventrículo direito.',
+        failureMessage: 'Cuidado! O Nitrato é vasodilatador e pode causar colapso circulatório em um paciente já hipotenso.'
+      }
+    ]
+  },
+  {
+    id: 's-gaso-1',
+    title: 'Interpretação de Emergência: Gasometria',
+    description: 'Paciente com insuficiência respiratória grave. Interprete os resultados para definir a conduta.',
+    difficulty: 'Média',
+    xpReward: 250,
+    requiredLessonId: 'l_gaso',
+    steps: [
+      {
+        id: 'gas_1',
+        description: 'Resultados: pH 7.28, pCO2 55, HCO3 24. Qual o distúrbio?',
+        options: [
+          'Alcalose Metabólica',
+          'Acidose Respiratória',
+          'Acidose Metabólica',
+          'Gasometria Normal'
+        ],
+        correctAnswerIndex: 1,
+        successMessage: 'Correto! pH baixo com CO2 alto indica acidose respiratória (hipoventilação).',
+        failureMessage: 'Lembre-se: CO2 alto retém ácido no sangue, baixando o pH.'
+      },
+      {
+        id: 'gas_2',
+        description: 'O paciente está confuso e bradipneico. Qual a conduta de enfermagem prioritária?',
+        options: [
+          'Oferecer água',
+          'Preparar material para intubação e suporte ventilatório',
+          'Aumentar o soro',
+          'Pedir novos exames para amanhã'
+        ],
+        correctAnswerIndex: 1,
+        successMessage: 'Isso mesmo! O paciente está em falência respiratória e precisa de suporte imediato.',
+        failureMessage: 'O suporte ventilatório é a única forma de lavar o excesso de CO2 e subir o pH.'
+      }
+    ]
+  },
+  {
+    id: 's-hpp-1',
+    title: 'Código Vermelho: Hemorragia Pós-Parto',
+    description: 'Puerpéra com sangramento transvaginal massivo após parto normal. O útero está amolecido.',
+    difficulty: 'Alta',
+    xpReward: 400,
+    requiredLessonId: 'l_hem_pos',
+    steps: [
+      {
+        id: 'hpp_1',
+        description: 'O útero está acima da cicatriz umbilical e amolecido (globo de segurança ausente). Qual a primeira medida?',
+        options: [
+          'Cobrir a paciente',
+          'Massagem uterina bimanual imediata (Manobra de Hamilton)',
+          'Esperar o médico chegar para tocar na paciente',
+          'Dar alta para a paciente'
+        ],
+        correctAnswerIndex: 1,
+        successMessage: 'Correto! A massagem estimula a contração mecânica do útero (tônus).',
+        failureMessage: 'A massagem bimanual é a primeira linha para estancar a atonia uterina.'
+      },
+      {
+        id: 'hpp_2',
+        description: 'A massagem foi iniciada. Qual medicação deve ser preparada para infusão endovenosa rápida conforme protocolo?',
+        options: [
+          'Vitamina C',
+          'Ocitocina 20 UI em 500ml de RL',
+          'Glicose 50%',
+          'Buscopan'
+        ],
+        correctAnswerIndex: 1,
+        successMessage: 'Excelente! A ocitocina é o padrão-ouro para reverter a atonia uterina.',
+        failureMessage: 'A ocitocina é fundamental para manter o útero contraído e parar o sangramento.'
+      }
+    ]
+  }
+    ]
+  },
+  {
+    id: 's-hoch-1',
+    title: 'Prática IM: Técnica de Hochstetter',
+    description: 'Administração de medicamento por via intramuscular em região ventro-glútea.',
+    difficulty: 'Média',
+    xpReward: 300,
+    requiredLessonId: 'l_hoch',
+    steps: [
+      {
+        id: 'hoch_1',
+        description: 'Qual a posição correta da mão para localizar o sítio de punção?',
+        options: [
+          'Palma da mão no joelho',
+          'Palma da mão no grande trocanter do fêmur, com dedo indicador na espinha ilíaca',
+          'Qualquer lugar no glúteo',
+          'Dedo indicador no umbigo'
+        ],
+        correctAnswerIndex: 1,
+        successMessage: 'Correto! A anatomia é a chave para a segurança nesta técnica.',
+        failureMessage: 'Lembre-se: Palma no trocanter e indicador na espinha ilíaca anterossuperior.'
+      },
+      {
+        id: 'hoch_2',
+        description: 'Onde exatamente a agulha deve ser inserida?',
+        options: [
+          'Na ponta do dedo médio',
+          'No centro do "V" formado pelos dedos médio e indicador',
+          'Fora da crista ilíaca',
+          'No local com mais gordura'
+        ],
+        correctAnswerIndex: 1,
+        successMessage: 'Isso! O centro do V é a zona de segurança livre de nervos.',
+        failureMessage: 'O centro do triângulo (V) formado pelos dedos é a área alvo.'
+      }
+    ]
+  }
 ];
