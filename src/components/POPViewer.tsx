@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ChevronRight, BookOpen, AlertCircle, CheckCircle2, Search } from 'lucide-react';
 import { POP } from '../types';
-import { POPS } from '../data';
+import { POPS } from '../data/index';
 
-export default function POPViewer({ onClose }: { onClose: () => void }) {
+export default function POPViewer({ onClose, userLevel, completedLessons }: { onClose: () => void, userLevel: number, completedLessons: string[] }) {
   const [selectedPOP, setSelectedPOP] = useState<POP | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -56,19 +56,42 @@ export default function POPViewer({ onClose }: { onClose: () => void }) {
               </div>
 
               <div className="space-y-3">
-                {filteredPOPS.map((pop) => (
-                  <button
-                    key={pop.id}
-                    onClick={() => setSelectedPOP(pop)}
-                    className="w-full p-5 bg-surface border border-border rounded-[24px] flex items-center justify-between group hover:border-accent hover:bg-surface-hover transition-all text-left"
-                  >
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-accent uppercase tracking-widest">{pop.category}</span>
-                      <h3 className="text-lg font-bold text-text-primary">{pop.title}</h3>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-text-secondary group-hover:text-accent transition-colors" />
-                  </button>
-                ))}
+                {filteredPOPS.map((pop) => {
+                  const isLevelLocked = pop.requiredLevel ? userLevel < pop.requiredLevel : false;
+                  const isLessonLocked = pop.requiredLessonId ? !completedLessons.includes(pop.requiredLessonId) : false;
+                  const isLocked = isLevelLocked || isLessonLocked;
+                  return (
+                    <button
+                      key={pop.id}
+                      onClick={() => !isLocked && setSelectedPOP(pop)}
+                      className={`w-full p-5 border rounded-[24px] flex items-center justify-between group transition-all text-left ${isLocked ? 'bg-bg/50 border-dashed border-border opacity-70 grayscale cursor-not-allowed' : 'bg-surface border-border hover:border-accent hover:bg-surface-hover'}`}
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-accent uppercase tracking-widest">{pop.category}</span>
+                          {isLevelLocked && (
+                            <div className="flex items-center gap-1 bg-warning/10 text-warning px-1.5 py-0.5 rounded text-[8px] font-black uppercase">
+                              Nível {pop.requiredLevel}
+                            </div>
+                          )}
+                          {isLessonLocked && (
+                            <div className="flex items-center gap-1 bg-accent/10 text-accent px-1.5 py-0.5 rounded text-[8px] font-black uppercase">
+                              Aula Pendente
+                            </div>
+                          )}
+                        </div>
+                        <h3 className={`text-lg font-bold ${isLocked ? 'text-text-secondary' : 'text-text-primary'}`}>{pop.title}</h3>
+                      </div>
+                      {isLocked ? (
+                        <div className="p-2 bg-border/30 rounded-full">
+                          <X className="w-4 h-4 text-text-secondary pr-0.5" /> {/* Primitive Lock style with X or just use lucide Lock if available */}
+                        </div>
+                      ) : (
+                        <ChevronRight className="w-5 h-5 text-text-secondary group-hover:text-accent transition-colors" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
           ) : (

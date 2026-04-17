@@ -16,11 +16,12 @@ export interface Flashcard {
   question: string;
   answer: string;
   tags: string[];
+  requiredLessonId?: string;
 }
 
 export interface ScenarioStep {
   id: string;
-  text: string;
+  description: string;
   options: ScenarioOption[];
 }
 
@@ -36,8 +37,10 @@ export interface Scenario {
   id: string;
   title: string;
   description: string;
-  initialStepId: string;
-  steps: Record<string, ScenarioStep>;
+  xpReward: number;
+  difficulty: 'Fácil' | 'Média' | 'Alta';
+  steps: ScenarioStep[];
+  requiredLessonId?: string;
 }
 
 export interface POPSection {
@@ -53,21 +56,26 @@ export interface POPStep {
 export interface POP {
   id: string;
   title: string;
+  description: string;
   category: string;
   objective: string;
   materials: string[];
   steps: POPStep[];
   precautions: string[];
+  precautions: string[];
+  requiredLevel?: number;
+  requiredLessonId?: string;
 }
 
 export interface DictionaryEntry {
-  id: string;
   term: string;
   definition: string;
-  category: 'sigla' | 'escala';
+  category?: 'sigla' | 'escala';
   details?: string;
   whatIs?: string;
   howToMeasure?: string;
+  requiredLevel?: number;
+  requiredLessonId?: string;
 }
 
 export interface Pill {
@@ -76,6 +84,14 @@ export interface Pill {
   category: string;
   content: string;
   duration: number;
+  requiredLevel?: number;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswerIndex: number;
 }
 
 export interface Lesson {
@@ -84,6 +100,7 @@ export interface Lesson {
   title: string;
   content: string;
   order: number;
+  questions?: QuizQuestion[];
 }
 
 export interface Badge {
@@ -92,4 +109,12 @@ export interface Badge {
   description: string;
   icon: string;
   unlocked: boolean;
+}
+
+export interface UserProfile {
+  name: string;
+  xp: number;
+  level: number;
+  lostPatients: number;
+  onboardingCompleted: boolean;
 }

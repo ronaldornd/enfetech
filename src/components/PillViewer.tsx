@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Clock, Zap, BookOpen, ChevronRight, Share2 } from 'lucide-react';
 import { Pill } from '../types';
-import { PILLS } from '../data';
+import { PILLS } from '../data/index';
 
 export default function PillViewer({ onClose, onPillRead }: { onClose: () => void, onPillRead?: (pill: Pill) => void }) {
   const [selectedPill, setSelectedPill] = useState<Pill | null>(null);

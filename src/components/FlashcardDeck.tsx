@@ -4,14 +4,18 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Check, ArrowRight, RotateCcw, BookOpen } from 'lucide-react';
 import { FLASHCARDS } from '../data';
 
-export default function FlashcardDeck({ onClose, moduleId }: { onClose: () => void, moduleId?: string }) {
+export default function FlashcardDeck({ onClose, moduleId, completedLessons }: { onClose: () => void, moduleId?: string, completedLessons: string[] }) {
   const [index, setIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
 
-  const filteredCards = moduleId 
+  const allCards = moduleId 
     ? FLASHCARDS.filter(c => c.moduleId === moduleId)
     : FLASHCARDS;
+
+  const filteredCards = allCards.filter(c => 
+    !c.requiredLessonId || completedLessons.includes(c.requiredLessonId)
+  );
 
   const card = filteredCards[index];
 
@@ -31,7 +35,11 @@ export default function FlashcardDeck({ onClose, moduleId }: { onClose: () => vo
           <BookOpen className="w-10 h-10" />
         </div>
         <h2 className="text-2xl font-bold text-text-primary">Ops!</h2>
-        <p className="text-text-secondary">Ainda não temos cartões preparados para este módulo específico. Tente a "Prática Geral".</p>
+        <p className="text-text-secondary">
+          {allCards.length > 0 
+            ? "Você precisa concluir as lições deste módulo para liberar os flashcards!" 
+            : "Ainda não temos cartões preparados para este módulo específico."}
+        </p>
         <button 
           onClick={onClose}
           className="w-full max-w-xs bg-surface border border-border text-text-primary py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all"

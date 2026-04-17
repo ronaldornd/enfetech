@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -29,7 +29,9 @@ import {
   POPS,
   PILLS,
   LESSONS
-} from './data';
+} from './data/index';
+import { storage } from './utils/storage';
+import { haptics } from './utils/haptics';
 import { Module, Scenario, Flashcard as FlashcardType, Lesson } from './types';
 import DripRateCalculator from './components/DripRateCalculator';
 import FlashcardDeck from './components/FlashcardDeck';
@@ -38,6 +40,9 @@ import DictionaryExplorer from './components/DictionaryExplorer';
 import PillViewer from './components/PillViewer';
 import GlobalSearch from './components/GlobalSearch';
 import LessonViewer from './components/LessonViewer';
+import Onboarding from './components/Onboarding';
+import { UserProfile } from './types';
+import { SuccessOverlay } from './components/SuccessOverlay';
 
 // Components
 const StatCard = ({ label, value, icon: Icon, colorClass }: any) => (
@@ -67,7 +72,10 @@ const ModuleCard = ({ module, onClick }: { module: Module; onClick: () => void; 
     <motion.button 
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      onClick={onClick}
+      onClick={() => {
+        haptics.light();
+        onClick();
+      }}
       className="w-full text-left bg-surface p-5 rounded-3xl shadow-sm border border-border group transition-all hover:border-accent hover:bg-surface-hover"
     >
       <div className="flex justify-between items-start mb-4">
@@ -101,19 +109,224 @@ export default function App() {
   const [showSearch, setShowSearch] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [showDictionary, setShowDictionary] = useState<{ show: boolean, tab: 'sigla' | 'escala' }>({ show: false, tab: 'sigla' });
+  const [successState, setSuccessState] = useState<{ show: boolean, type: 'level' | 'badge' | 'lesson', title: string, subtitle: string }>({
+    show: false,
+    type: 'lesson',
+    title: '',
+    subtitle: ''
+  });
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [selectedModuleForLessons, setSelectedModuleForLessons] = useState<Module | null>(null);
-  const [xp, setXp] = useState(1250);
-  const [level, setLevel] = useState(5);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [xp, setXp] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [lostPatients, setLostPatients] = useState(0);
+  const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+  const [completedScenarios, setCompletedScenarios] = useState<string[]>([]);
+  const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
+  const [lessonLocks, setLessonLocks] = useState<Record<string, number>>({});
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  const [showAchievement, setShowAchievement] = useState<{ show: boolean, title: string, subtitle: string, icon: any } | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showNotification, setShowNotification] = useState<{ show: boolean, title: string, subtitle: string, type: 'success' | 'error' | 'info' } | null>(null);
+
+  // Load state from storage
+  useEffect(() => {
+    async function loadData() {
+      // Migrate legacy localStorage data if any
+      await storage.migrate();
+      
+      const savedProfile = await storage.get<UserProfile>('enfetech_profile');
+      if (savedProfile) {
+        setProfile(savedProfile);
+        setXp(savedProfile.xp);
+        setLevel(savedProfile.level);
+        setLostPatients(savedProfile.lostPatients || 0);
+      }
+      
+      const savedLessons = await storage.get<string[]>('enfetech_lessons') || [];
+      setCompletedLessons(savedLessons);
+
+      const savedScenarios = await storage.get<string[]>('enfetech_scenarios') || [];
+      setCompletedScenarios(savedScenarios);
+      
+      const savedBadges = await storage.get<string[]>('enfetech_badges') || [];
+      setUnlockedBadges(savedBadges);
+      
+      const savedLocks = await storage.get<Record<string, number>>('enfetech_lesson_locks') || {};
+      setLessonLocks(savedLocks);
+      
+      setIsInitialized(true);
+    }
+    loadData();
+  }, []);
+
+  // Sync state to storage
+  useEffect(() => {
+    if (profile) {
+      storage.set('enfetech_profile', { ...profile, xp, level, lostPatients });
+    }
+  }, [profile, xp, level, lostPatients]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      storage.set('enfetech_lessons', completedLessons);
+    }
+  }, [completedLessons, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      storage.set('enfetech_badges', unlockedBadges);
+    }
+  }, [unlockedBadges, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      storage.set('enfetech_scenarios', completedScenarios);
+    }
+  }, [completedScenarios, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      storage.set('enfetech_lesson_locks', lessonLocks);
+    }
+  }, [lessonLocks, isInitialized]);
+
+  // Dynamic progress calculation
+  const dynamicModules = useMemo(() => {
+    return MODULES.map(m => {
+      const moduleLessons = LESSONS.filter(l => l.moduleId === m.id);
+      if (moduleLessons.length === 0) return { ...m, progress: 0 };
+      
+      const done = moduleLessons.filter(l => completedLessons.includes(l.id)).length;
+      return { ...m, progress: Math.round((done / moduleLessons.length) * 100) };
+    });
+  }, [completedLessons]);
 
   const addXp = (amount: number) => {
-    const newXp = xp + amount;
-    if (newXp >= level * 1000) {
-      setLevel(level + 1);
-      setShowLevelUp(true);
-      setTimeout(() => setShowLevelUp(false), 3000);
+    setXp(prev => {
+      const newXp = prev + amount;
+      if (newXp >= level * 1000) {
+        setLevel(l => l + 1);
+        handleBadgeUnlock('b4'); // Level up badge
+        haptics.success();
+        setSuccessState({
+            show: true,
+            type: 'level',
+            title: 'Subiu de Nível!',
+            subtitle: `Você agora é nível ${level + 1}`
+        });
+      } else {
+        haptics.light();
+      }
+      return newXp;
+    });
+  };
+
+  const removeXp = (amount: number, reason: string) => {
+    setXp(prev => {
+      const newXp = Math.max(0, prev - amount);
+      haptics.error();
+      setShowNotification({
+        show: true,
+        title: 'Penalidade Ética',
+        subtitle: `-${amount} XP: ${reason}`,
+        type: 'error'
+      });
+      setTimeout(() => setShowNotification(null), 4000);
+      return newXp;
+    });
+  };
+
+  const reportDeath = () => {
+    setLostPatients(prev => prev + 1);
+    removeXp(200, 'Evento Adverso Grave (Óbito)');
+  };
+
+  const handleBadgeUnlock = (badgeId: string) => {
+    if (!unlockedBadges.includes(badgeId)) {
+      setUnlockedBadges(prev => [...prev, badgeId]);
+      haptics.medium();
+      const badge = BADGES.find(b => b.id === badgeId);
+      if (badge) {
+        setShowAchievement({
+            show: true,
+            title: 'Conquista Desbloqueada!',
+            subtitle: badge.title,
+            icon: Award
+        });
+        setTimeout(() => setShowAchievement(null), 3000);
+      }
     }
-    setXp(newXp);
+  };
+
+  const markLessonComplete = (lessonId: string) => {
+    if (!completedLessons.includes(lessonId)) {
+      setCompletedLessons(prev => [...prev, lessonId]);
+      
+      // Limpa a trava caso exista ao completar
+      if (lessonLocks[lessonId]) {
+        const newLocks = { ...lessonLocks };
+        delete newLocks[lessonId];
+        setLessonLocks(newLocks);
+      }
+
+      addXp(100);
+      
+      // Check for lesson master badge
+      const totalDone = completedLessons.length + 1;
+      if (totalDone >= 5 && !unlockedBadges.includes('b5')) {
+        handleBadgeUnlock('b5');
+      }
+    }
+  };
+
+  const markLessonFailed = (lessonId: string) => {
+    const lockUntil = Date.now() + 180000; // 3 minutos
+    setLessonLocks(prev => ({
+      ...prev,
+      [lessonId]: lockUntil
+    }));
+  };
+
+  const resetAllData = () => {
+    try { haptics.medium(); } catch(e) {}
+    setShowResetConfirm(true);
+  };
+
+  const executeReset = async () => {
+    try {
+      await storage.clear();
+      // Limpa estados locais
+      setProfile(null);
+      setCompletedLessons([]);
+      setCompletedScenarios([]);
+      setUnlockedBadges([]);
+      setLessonLocks({});
+      setXp(0);
+      setLevel(1);
+      setLostPatients(0);
+      setShowResetConfirm(false);
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    } catch (error) {
+      console.error('Erro ao limpar dados:', error);
+      alert('Erro ao limpar dados. Tente fechar e abrir o app.');
+    }
+  };
+
+  const handleOnboardingComplete = (newProfile: UserProfile) => {
+    setProfile(newProfile);
+    setXp(newProfile.xp);
+    setLevel(newProfile.level);
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab as any);
+    haptics.light();
   };
 
   const handleSearchResult = (type: string, id: string, extra?: any) => {
@@ -121,7 +334,7 @@ export default function App() {
     switch (type) {
       case 'module':
         {
-          const mod = MODULES.find(m => m.id === id);
+          const mod = dynamicModules.find(m => m.id === id);
           if (mod) {
             setActiveTab('learn');
             setSelectedModuleForLessons(mod);
@@ -145,7 +358,43 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#050505] pb-24 max-w-md mx-auto relative overflow-x-hidden border-x border-border shadow-2xl bg-bg">
+      <SuccessOverlay 
+        show={successState.show}
+        type={successState.type}
+        title={successState.title}
+        subtitle={successState.subtitle}
+        onClose={() => setSuccessState(prev => ({ ...prev, show: false }))}
+      />
+
+      <AnimatePresence>
+        {showNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className={`fixed bottom-28 left-6 right-6 z-[100] px-5 py-4 rounded-3xl shadow-2xl flex items-center gap-4 border ${
+              showNotification.type === 'error' ? 'bg-red-500/90 border-red-400 text-white shadow-red-500/20' : 'bg-surface/90 border-border text-text-primary backdrop-blur-xl'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
+              showNotification.type === 'error' ? 'bg-white/20' : 'bg-accent/10'
+            }`}>
+               {showNotification.type === 'error' ? <Zap className="w-5 h-5 text-white" /> : <ShieldCheck className="w-5 h-5 text-accent" />}
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-80">{showNotification.title}</p>
+              <h4 className="font-bold leading-tight">{showNotification.subtitle}</h4>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="absolute inset-0 bg-dot-pattern opacity-[0.03] pointer-events-none" />
+      
+      <AnimatePresence>
+        {!profile && isInitialized && (
+          <Onboarding onComplete={handleOnboardingComplete} />
+        )}
+      </AnimatePresence>
       
       {/* Level Up Notification */}
       <AnimatePresence>
@@ -170,7 +419,7 @@ export default function App() {
           <div className="flex items-center gap-3">
             <div>
               <h1 className="text-2xl font-black text-text-primary tracking-tight">EnfeTech</h1>
-              <p className="text-sm font-medium text-text-secondary">Olá, Ronaldo!</p>
+              <p className="text-sm font-medium text-text-secondary">Olá, {profile?.name || 'Visitante'}!</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -191,12 +440,12 @@ export default function App() {
         <div className="mb-4">
           <div className="flex justify-between text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-1.5">
             <span>Experiência (XP)</span>
-            <span>{xp} / 2000</span>
+            <span>{xp} / {level * 1000}</span>
           </div>
           <div className="h-2 bg-border rounded-full overflow-hidden">
             <motion.div 
               initial={{ width: 0 }}
-              animate={{ width: `${(xp / 2000) * 100}%` }}
+              animate={{ width: `${(xp / (level * 1000)) * 100}%` }}
               className="h-full bg-accent rounded-full"
             />
           </div>
@@ -223,11 +472,11 @@ export default function App() {
               {/* Training Modules Title */}
               <section>
                 <div className="flex justify-between items-end mb-4">
-                  <h2 className="text-xl font-bold tracking-tight text-text-primary">Trilhas de Estudo</h2>
-                  <button className="text-accent text-sm font-bold hover:underline">Ver tudo</button>
+                  <h2 className="text-xl font-bold tracking-tight text-text-primary">Trilhas Ativas</h2>
+                  <button onClick={() => setActiveTab('learn')} className="text-accent text-sm font-bold hover:underline">Ver todas</button>
                 </div>
                 <div className="grid gap-4">
-                  {MODULES.map(m => (
+                  {dynamicModules.filter(m => m.progress < 100).map(m => (
                     <ModuleCard 
                       key={m.id} 
                       module={m} 
@@ -237,6 +486,13 @@ export default function App() {
                       }} 
                     />
                   ))}
+                  {dynamicModules.filter(m => m.progress < 100).length === 0 && (
+                    <div className="bg-surface p-8 rounded-3xl border border-border text-center">
+                      <ShieldCheck className="w-12 h-12 text-success mx-auto mb-3 opacity-50" />
+                      <p className="text-text-secondary font-medium">Todas as trilhas concluídas!</p>
+                      <button onClick={() => setActiveTab('learn')} className="text-accent text-sm font-bold mt-2">Revisar aulas</button>
+                    </div>
+                  )}
                 </div>
               </section>
 
@@ -260,7 +516,22 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'sim' && <SimulatorsView onFinish={() => addXp(200)} />}
+          {activeTab === 'sim' && <SimulatorsView 
+            completedScenarios={completedScenarios}
+            onScenarioComplete={(scenario) => {
+              if (!completedScenarios.includes(scenario.id)) {
+                setCompletedScenarios(prev => [...prev, scenario.id]);
+                addXp(scenario.xpReward);
+                setSuccessState({
+                  show: true,
+                  type: 'lesson',
+                  title: 'Missão Cumprida!',
+                  subtitle: `Você concluiu o cenário: ${scenario.title}`
+                });
+              }
+            }} 
+            onFail={reportDeath} 
+          />}
           {activeTab === 'learn' && (
             <LearnView 
               selectedModule={selectedModuleForLessons}
@@ -268,10 +539,11 @@ export default function App() {
               onBackToModules={() => setSelectedModuleForLessons(null)}
               onOpenLesson={(lesson) => {
                 setActiveLesson(lesson);
-                addXp(100);
               }}
               onStartFlashcards={(moduleId?: string) => setShowFlashcards({ show: true, moduleId })} 
               onOpenPills={() => setShowPills(true)}
+              completedLessons={completedLessons}
+              dynamicModules={dynamicModules}
             />
           )}
           {activeTab === 'tools' && (
@@ -287,7 +559,51 @@ export default function App() {
               }}
             />
           )}
-          {activeTab === 'profile' && <ProfileView xp={xp} level={level} />}
+          {activeTab === 'profile' && (
+            <ProfileView 
+              xp={xp} 
+              level={level} 
+              name={profile?.name || 'Usuário'} 
+              lostPatients={lostPatients}
+              onReset={() => setShowResetConfirm(true)} 
+              completedLessons={completedLessons}
+              unlockedBadges={unlockedBadges}
+            />
+          )}
+          {showResetConfirm && (
+          <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              className="bg-surface w-full max-w-sm rounded-[32px] p-8 border border-border shadow-2xl space-y-6"
+            >
+              <div className="w-16 h-16 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto">
+                <Zap className="w-8 h-8 text-red-500" />
+              </div>
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-black text-text-primary">Zerar Progresso?</h3>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  Esta ação irá apagar permanentemente todas as suas aulas concluídas, XP, nível e simuladores. <strong>Não pode ser desfeita.</strong>
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 pt-2">
+                <button 
+                  onClick={executeReset}
+                  className="w-full py-4 bg-red-500 text-white rounded-2xl font-black text-sm shadow-xl shadow-red-500/20 active:scale-95 transition-all"
+                >
+                  SIM, APAGAR TUDO
+                </button>
+                <button 
+                  onClick={() => setShowResetConfirm(false)}
+                  className="w-full py-4 bg-bg border border-border text-text-primary rounded-2xl font-bold text-sm active:scale-95 transition-all"
+                >
+                  CANCELAR
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
         </AnimatePresence>
       </main>
 
@@ -301,9 +617,16 @@ export default function App() {
               setShowFlashcards({ show: false });
               addXp(50);
             }} 
+            completedLessons={completedLessons}
           />
         )}
-        {showPOPs && <POPViewer onClose={() => setShowPOPs(false)} />}
+        {showPOPs && (
+          <POPViewer 
+            onClose={() => setShowPOPs(false)} 
+            userLevel={level} 
+            completedLessons={completedLessons}
+          />
+        )}
         {showPills && (
           <PillViewer 
             onClose={() => setShowPills(false)} 
@@ -314,6 +637,8 @@ export default function App() {
           <DictionaryExplorer 
             onClose={() => setShowDictionary({ ...showDictionary, show: false })} 
             initialTab={showDictionary.tab}
+            userLevel={level}
+            completedLessons={completedLessons}
           />
         )}
         {showSearch && (
@@ -326,6 +651,10 @@ export default function App() {
           <LessonViewer 
             lesson={activeLesson}
             onClose={() => setActiveLesson(null)}
+            onComplete={() => markLessonComplete(activeLesson.id)}
+            onFail={() => markLessonFailed(activeLesson.id)}
+            completed={completedLessons.includes(activeLesson.id)}
+            lockUntil={lessonLocks[activeLesson.id]}
             isFirst={LESSONS.filter(l => l.moduleId === activeLesson.moduleId).indexOf(activeLesson) === 0}
             isLast={LESSONS.filter(l => l.moduleId === activeLesson.moduleId).indexOf(activeLesson) === LESSONS.filter(l => l.moduleId === activeLesson.moduleId).length - 1}
             onNext={() => {
@@ -340,6 +669,22 @@ export default function App() {
             }}
           />
         )}
+        {showAchievement && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 50 }}
+            className="fixed top-12 left-6 right-6 z-[100] bg-surface/90 backdrop-blur-2xl border border-accent/30 p-4 rounded-3xl shadow-2xl flex items-center gap-4"
+          >
+            <div className="w-12 h-12 bg-accent rounded-2xl flex items-center justify-center text-white shadow-lg shadow-accent/20">
+              <showAchievement.icon className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-accent mb-0.5">{showAchievement.title}</p>
+              <h4 className="font-bold text-text-primary leading-none">{showAchievement.subtitle}</h4>
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* Bottom Navigation */}
@@ -353,13 +698,17 @@ export default function App() {
         ].map(item => (
           <button
             key={item.id}
-            onClick={() => setActiveTab(item.id as any)}
-            className={`flex flex-col items-center gap-1 flex-1 py-3 transition-colors ${activeTab === item.id ? 'text-accent' : 'text-text-secondary'}`}
+            onClick={() => handleTabChange(item.id)}
+            className={`flex flex-col items-center gap-1 flex-1 py-3 transition-colors relative ${activeTab === item.id ? 'text-accent' : 'text-text-secondary'}`}
           >
-            <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'scale-110' : ''}`} />
-            <span className="text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
+            <item.icon className={`w-5 h-5 z-10 ${activeTab === item.id ? 'scale-110' : ''}`} />
+            <span className="text-[10px] font-bold uppercase tracking-widest z-10">{item.label}</span>
             {activeTab === item.id && (
-              <motion.div layoutId="nav-indicator" className="w-1 h-1 bg-accent rounded-full" />
+              <motion.div 
+                layoutId="nav-pill" 
+                className="absolute inset-0 bg-accent/10 rounded-2xl m-1" 
+                transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+              />
             )}
           </button>
         ))}
@@ -414,14 +763,18 @@ function LearnView({
   selectedModule, 
   onSelectModule, 
   onBackToModules,
-  onOpenLesson
+  onOpenLesson,
+  completedLessons,
+  dynamicModules
 }: { 
   onStartFlashcards: (modId?: string) => void, 
   onOpenPills: () => void,
   selectedModule: Module | null,
   onSelectModule: (m: Module) => void,
   onBackToModules: () => void,
-  onOpenLesson: (l: Lesson) => void
+  onOpenLesson: (l: Lesson) => void,
+  completedLessons: string[],
+  dynamicModules: any[]
 }) {
   const modLessons = selectedModule ? LESSONS.filter(l => l.moduleId === selectedModule.id) : [];
 
@@ -447,22 +800,28 @@ function LearnView({
 
         <div className="space-y-3">
           {modLessons.length > 0 ? (
-            modLessons.map((l, idx) => (
-              <button
-                key={l.id}
-                onClick={() => onOpenLesson(l)}
-                className="w-full flex items-center gap-4 p-4 bg-surface rounded-2xl border border-border group hover:border-accent transition-all"
-              >
-                <div className="w-10 h-10 bg-bg rounded-xl flex items-center justify-center font-black text-accent group-hover:bg-accent group-hover:text-white transition-colors">
-                  {idx + 1}
-                </div>
-                <div className="text-left flex-1">
-                  <h4 className="font-bold text-text-primary">{l.title}</h4>
-                  <p className="text-xs text-text-secondary">Aula Completa • 100 XP</p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-text-secondary" />
-              </button>
-            ))
+            modLessons.map((l, idx) => {
+              const isCompleted = completedLessons.includes(l.id);
+              const isLocked = !isCompleted && modLessons.slice(0, idx).some(prev => !completedLessons.includes(prev.id));
+              return (
+                <button
+                  key={l.id}
+                  onClick={() => !isLocked && onOpenLesson(l)}
+                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all ${isLocked ? 'bg-bg/50 border-dashed border-border opacity-60 grayscale' : 'bg-surface border-border group hover:border-accent'}`}
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black transition-colors ${isLocked ? 'bg-border text-text-secondary' : 'bg-bg text-accent group-hover:bg-accent group-hover:text-white'}`}>
+                    {idx + 1}
+                  </div>
+                  <div className="text-left flex-1">
+                    <h4 className={`font-bold ${isLocked ? 'text-text-secondary' : 'text-text-primary'}`}>{l.title}</h4>
+                    <p className="text-xs text-text-secondary">
+                      {isLocked ? '🔒 Bloqueada' : (completedLessons.includes(l.id) ? '✅ Concluída' : '📖 Disponível • 100 XP')}
+                    </p>
+                  </div>
+                  {!isLocked && <ChevronRight className="w-5 h-5 text-text-secondary" />}
+                </button>
+              );
+            })
           ) : (
             <div className="p-8 text-center bg-surface rounded-3xl border border-border italic text-text-secondary">
               Conteúdo em desenvolvimento para este módulo.
@@ -514,38 +873,48 @@ function LearnView({
 
       <div className="space-y-3 pb-8">
         <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary px-2">Disciplinas Acadêmicas</p>
-        {MODULES.map(m => (
-          <div 
-            key={m.id} 
-            onClick={() => onSelectModule(m)}
-            className="flex items-center justify-between p-4 bg-surface rounded-2xl border border-border shadow-sm cursor-pointer hover:bg-surface-hover transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-bg group-hover:bg-accent/10 flex items-center justify-center rounded-xl transition-colors">
-                <BookOpen className="w-5 h-5 text-text-secondary group-hover:text-accent" />
+        {MODULES.map(m => {
+          const modWithProgress = dynamicModules.find(mod => mod.id === m.id);
+          return (
+            <div 
+              key={m.id} 
+              onClick={() => onSelectModule(m)}
+              className="flex items-center justify-between p-4 bg-surface rounded-2xl border border-border shadow-sm cursor-pointer hover:bg-surface-hover transition-all group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-bg group-hover:bg-accent/10 flex items-center justify-center rounded-xl transition-colors">
+                  <BookOpen className="w-5 h-5 text-text-secondary group-hover:text-accent" />
+                </div>
+                <div>
+                  <span className="font-bold text-text-primary block">{m.title}</span>
+                  <span className="text-[10px] font-bold text-accent">{modWithProgress?.progress || 0}% concluído</span>
+                </div>
               </div>
-              <span className="font-bold text-text-primary">{m.title}</span>
+              <ChevronRight className="w-5 h-5 text-text-secondary" />
             </div>
-            <ChevronRight className="w-5 h-5 text-text-secondary" />
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 }
 
-function SimulatorsView({ onFinish }: { onFinish: () => void }) {
+function SimulatorsView({ completedScenarios, onScenarioComplete, onFail }: { completedScenarios: string[], onScenarioComplete: (s: Scenario) => void, onFail: () => void }) {
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
   const [currentStepId, setCurrentStepId] = useState<string | null>(null);
   const [result, setResult] = useState<{ feedback: string; isCorrect: boolean } | null>(null);
 
   const startScenario = (scenario: Scenario) => {
     setActiveScenario(scenario);
-    setCurrentStepId(scenario.initialStepId);
+    setCurrentStepId(scenario.steps[0].id);
     setResult(null);
   };
 
-  const currentStep = activeScenario && currentStepId ? activeScenario.steps[currentStepId] : null;
+  const filteredScenarios = SCENARIOS.filter(s => {
+    const notCompleted = !completedScenarios.includes(s.id);
+    const isUnlocked = !s.requiredLessonId || completedLessons.includes(s.requiredLessonId);
+    return notCompleted && isUnlocked;
+  });
 
   return (
     <div className="space-y-6">
@@ -553,18 +922,32 @@ function SimulatorsView({ onFinish }: { onFinish: () => void }) {
       
       {!activeScenario ? (
         <div className="space-y-4">
-          {SCENARIOS.map(s => (
+          {filteredScenarios.slice(0, 2).map(s => (
             <div key={s.id} className="bg-surface p-5 rounded-3xl border border-border shadow-sm group">
-              <h3 className="font-bold text-lg mb-2 text-text-primary">{s.title}</h3>
-              <p className="text-text-secondary text-sm mb-4">{s.description}</p>
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-bold text-lg text-text-primary">{s.title}</h3>
+                <span className="text-[10px] font-black text-accent bg-accent/10 px-2 py-1 rounded">{s.difficulty}</span>
+              </div>
+              <p className="text-text-secondary text-sm mb-4 leading-relaxed">{s.description}</p>
               <button 
                 onClick={() => startScenario(s)}
-                className="w-full bg-accent text-white py-3 rounded-2xl font-bold text-sm hover:bg-accent/80 transition-colors"
+                className="w-full bg-accent text-white py-3 rounded-2xl font-bold text-sm hover:bg-accent/80 transition-colors shadow-lg shadow-accent/20"
               >
                 Atender Paciente
               </button>
             </div>
           ))}
+          {filteredScenarios.length === 0 && (
+            <div className="bg-surface p-8 rounded-3xl border border-border text-center">
+              <Award className="w-12 h-12 text-warning mx-auto mb-3" />
+              <p className="text-text-secondary font-bold">
+                {SCENARIOS.filter(s => !completedScenarios.includes(s.id)).length > 0 
+                  ? 'Complete as aulas teóricas para liberar novos simuladores práticos.'
+                  : 'Todos os cenários concluídos!'}
+              </p>
+              <p className="text-xs text-text-secondary mt-1">O conhecimento precede a prática.</p>
+            </div>
+          )}
         </div>
       ) : result ? (
         <motion.div 
@@ -583,7 +966,11 @@ function SimulatorsView({ onFinish }: { onFinish: () => void }) {
             onClick={() => {
               setActiveScenario(null);
               setResult(null);
-              if (result.isCorrect) onFinish();
+              if (result.isCorrect && activeScenario) {
+                onScenarioComplete(activeScenario);
+              } else {
+                onFail();
+              }
             }}
             className="w-full bg-accent text-white py-4 rounded-2xl font-bold transition-all hover:shadow-lg hover:shadow-accent/20 active:scale-95"
           >
@@ -602,7 +989,7 @@ function SimulatorsView({ onFinish }: { onFinish: () => void }) {
           </div>
           
           <div className="space-y-4">
-            <h3 className="text-xl font-black leading-tight text-text-primary">{currentStep?.text}</h3>
+            <h3 className="text-xl font-black leading-tight text-text-primary">{currentStep?.description}</h3>
             <div className="space-y-3">
               {currentStep?.options.map((opt, idx) => (
                 <button
@@ -627,12 +1014,11 @@ function SimulatorsView({ onFinish }: { onFinish: () => void }) {
   );
 }
 
-function ProfileView({ xp, level }: { xp: number, level: number }) {
+function ProfileView({ xp, level, name, lostPatients, onReset, completedLessons, unlockedBadges }: { xp: number, level: number, name: string, lostPatients: number, onReset?: () => void, completedLessons: string[], unlockedBadges: string[] }) {
   const stats = [
     { label: 'Total XP', value: xp, icon: Zap },
-    { label: 'POPs Lidos', value: POPS.length, icon: ShieldCheck },
-    { label: 'Flashcards', value: FLASHCARDS.length, icon: BookOpen },
-    { label: 'Pílulas', value: PILLS.length, icon: CirclePlay },
+    { label: 'Aulas Lidas', value: completedLessons.length, icon: ShieldCheck },
+    { label: 'Conquistas', value: unlockedBadges.length, icon: Award },
   ];
 
   return (
@@ -640,11 +1026,26 @@ function ProfileView({ xp, level }: { xp: number, level: number }) {
       <div className="flex flex-col items-center gap-4 py-6">
         <div className="w-24 h-24 bg-accent rounded-full flex items-center justify-center text-white text-3xl font-black shadow-xl ring-4 ring-surface relative overflow-hidden">
           <div className="absolute inset-0 bg-dot-pattern opacity-20" />
-          RF
+          {name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
         </div>
         <div className="text-center">
-          <h2 className="text-xl font-bold text-text-primary">Ronaldo Firmesa</h2>
-          <p className="text-text-secondary font-medium lowercase">@ronaldo.firmesa</p>
+          <h2 className="text-xl font-bold text-text-primary">{name}</h2>
+          <p className="text-text-secondary font-medium lowercase">@{name.toLowerCase().replace(/\s+/g, '.')}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        <div className="bg-red-500/5 p-6 rounded-[32px] border border-red-500/20 flex justify-between items-center group">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">Pacientes Perdidos</p>
+            <p className="text-3xl font-black text-red-600 leading-none">{lostPatients}</p>
+          </div>
+          <motion.div
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+          >
+            <Zap className="w-8 h-8 text-red-500" />
+          </motion.div>
         </div>
       </div>
 
@@ -664,16 +1065,29 @@ function ProfileView({ xp, level }: { xp: number, level: number }) {
       <section>
         <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary mb-3 px-1">Conquistas Recentes</p>
         <div className="grid grid-cols-2 gap-3">
-          {BADGES.map(b => (
-            <div key={b.id} className={`p-4 rounded-2xl border flex flex-col items-center text-center gap-2 ${b.unlocked ? 'bg-surface border-border shadow-sm opacity-100' : 'bg-bg border-border opacity-50'}`}>
-              <div className={`p-2 rounded-lg ${b.unlocked ? 'bg-warning/10 text-warning' : 'bg-border text-text-secondary'}`}>
-                {b.id === 'b1' ? <Calculator className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
+          {BADGES.map(b => {
+             const isUnlocked = unlockedBadges.includes(b.id);
+             return (
+              <div key={b.id} className={`p-4 rounded-2xl border flex flex-col items-center text-center gap-2 ${isUnlocked ? 'bg-surface border-accent/30 shadow-sm opacity-100' : 'bg-bg border-border opacity-50'}`}>
+                <div className={`p-2 rounded-lg ${isUnlocked ? 'bg-warning/10 text-warning' : 'bg-border text-text-secondary'}`}>
+                  <Award className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-tight text-text-primary">{b.title}</span>
+                {isUnlocked && <span className="text-[8px] font-bold text-success uppercase">Desbloqueado</span>}
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-tight text-text-primary">{b.title}</span>
-            </div>
-          ))}
+             );
+          })}
         </div>
       </section>
+
+      {onReset && (
+        <button 
+          onClick={onReset}
+          className="w-full mt-10 py-4 bg-surface border border-error/20 text-error rounded-2xl font-bold text-xs uppercase tracking-[0.2em] hover:bg-error/5 transition-colors"
+        >
+          Zerar Banco de Dados
+        </button>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Search, ChevronRight, BookOpen, Zap, Shield, Hash, Calculator, CirclePlay } from 'lucide-react';
-import { MODULES, SCENARIOS, DICTIONARY, POPS, PILLS } from '../data';
+import { MODULES, SCENARIOS, DICTIONARY, POPS, PILLS, LESSONS } from '../data/index';
 
 interface SearchResult {
   type: 'module' | 'sim' | 'dictionary' | 'pop' | 'pill';
@@ -33,6 +33,13 @@ export default function GlobalSearch({
       }
     });
 
+    // Lessons (Deep Search)
+    LESSONS.forEach(l => {
+      if (l.title.toLowerCase().includes(q) || l.content.toLowerCase().includes(q)) {
+        matches.push({ type: 'module' as any, id: l.moduleId, title: l.title, subtitle: 'Aula: ' + l.content.substring(0, 60).replace(/[#*]/g, '') + '...' });
+      }
+    });
+
     // Simulators
     SCENARIOS.forEach(s => {
       if (s.title.toLowerCase().includes(q) || s.description.toLowerCase().includes(q)) {
@@ -43,13 +50,14 @@ export default function GlobalSearch({
     // Dictionary
     DICTIONARY.forEach(d => {
       if (d.term.toLowerCase().includes(q) || d.definition.toLowerCase().includes(q)) {
-        matches.push({ type: 'dictionary', id: d.id, title: d.term, subtitle: d.definition, category: d.category });
+        matches.push({ type: 'dictionary', id: d.term, title: d.term, subtitle: d.definition });
       }
     });
 
     // POPs
     POPS.forEach(p => {
-      if (p.title.toLowerCase().includes(q) || p.objective.toLowerCase().includes(q)) {
+      const stepMatch = p.steps.some(s => s.toLowerCase().includes(q));
+      if (p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || stepMatch) {
         matches.push({ type: 'pop', id: p.id, title: p.title, subtitle: p.category });
       }
     });

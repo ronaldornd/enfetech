@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Search, Hash, FileText, Info } from 'lucide-react';
 import { DictionaryEntry } from '../types';
-import { DICTIONARY } from '../data';
+import { DICTIONARY, SCALES } from '../data/index';
 
-export default function DictionaryExplorer({ onClose, initialTab = 'sigla' }: { onClose: () => void, initialTab?: 'sigla' | 'escala' }) {
+export default function DictionaryExplorer({ onClose, initialTab = 'sigla', userLevel, completedLessons }: { onClose: () => void, initialTab?: 'sigla' | 'escala', userLevel: number, completedLessons: string[] }) {
   const [activeType, setActiveType] = useState<'sigla' | 'escala'>(initialTab);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -67,50 +67,67 @@ export default function DictionaryExplorer({ onClose, initialTab = 'sigla' }: { 
       {/* List */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {filteredEntries.length > 0 ? (
-          filteredEntries.map((entry) => (
-            <motion.div 
-              layout
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              key={entry.id}
-              className="p-5 bg-surface border border-border rounded-[28px] space-y-3 group hover:border-accent/50 transition-colors"
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${activeType === 'sigla' ? 'bg-accent/10 text-accent' : 'bg-success/10 text-success'}`}>
-                    {activeType === 'sigla' ? <Hash className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+          filteredEntries.map((entry) => {
+            const isLevelLocked = entry.requiredLevel ? userLevel < entry.requiredLevel : false;
+            const isLessonLocked = entry.requiredLessonId ? !completedLessons.includes(entry.requiredLessonId) : false;
+            const isLocked = isLevelLocked || isLessonLocked;
+            return (
+              <motion.div 
+                layout
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                key={entry.term}
+                className={`p-5 border rounded-[28px] space-y-3 transition-colors ${isLocked ? 'bg-bg/50 border-dashed border-border opacity-70 grayscale' : 'bg-surface border-border hover:border-accent/50 group'}`}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${isLocked ? 'bg-border/50 text-text-secondary' : (activeType === 'sigla' ? 'bg-accent/10 text-accent' : 'bg-success/10 text-success')}`}>
+                      {isLocked ? <X className="w-4 h-4" /> : (activeType === 'sigla' ? <Hash className="w-4 h-4" /> : <FileText className="w-4 h-4" />)}
+                    </div>
+                    <div>
+                      <h3 className={`text-xl font-black tracking-tight ${isLocked ? 'text-text-secondary' : 'text-text-primary'}`}>{entry.term}</h3>
+                      {isLevelLocked && (
+                        <span className="text-[10px] font-black uppercase text-accent bg-accent/10 px-1.5 py-0.5 rounded">Liberado no Nível {entry.requiredLevel}</span>
+                      )}
+                      {isLessonLocked && (
+                        <span className="text-[10px] font-black uppercase text-warning bg-warning/10 px-1.5 py-0.5 rounded">Aula Pendente</span>
+                      )}
+                    </div>
                   </div>
-                  <h3 className="text-xl font-black text-text-primary tracking-tight">{entry.term}</h3>
                 </div>
-              </div>
-                {activeType === 'sigla' ? (
+                {!isLocked && (
                   <>
-                    <p className="text-text-primary font-bold leading-tight">{entry.definition}</p>
-                    {entry.details && (
-                      <div className="flex items-start gap-2 pt-2 text-text-secondary">
-                        <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                        <p className="text-xs italic leading-snug">{entry.details}</p>
+                    {activeType === 'sigla' ? (
+                      <>
+                        <p className="text-text-primary font-bold leading-tight">{entry.definition}</p>
+                        {entry.details && (
+                          <div className="flex items-start gap-2 pt-2 text-text-secondary">
+                            <span className="w-3.5 h-3.5 mt-0.5 shrink-0"><Info className="w-full h-full" /></span>
+                            <p className="text-xs italic leading-snug">{entry.details}</p>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="space-y-4 pt-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="px-2 py-0.5 bg-success/20 text-success text-[10px] font-black uppercase tracking-widest rounded-md border border-success/30">Protocolo de Enfermagem</span>
+                        </div>
+                        <div className="p-4 bg-bg rounded-2xl border border-border/50">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-accent mb-2">O que é?</p>
+                          <p className="text-sm text-text-primary leading-relaxed">{entry.whatIs || entry.definition}</p>
+                        </div>
+                        
+                        <div className="p-4 bg-success/5 rounded-2xl border border-success/20">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-success mb-2">Como medir?</p>
+                          <p className="text-sm text-text-secondary leading-relaxed font-medium">{entry.howToMeasure || 'Procedimento em revisão conforme protocolos institucionais.'}</p>
+                        </div>
                       </div>
                     )}
                   </>
-                ) : (
-                  <div className="space-y-4 pt-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2 py-0.5 bg-success/20 text-success text-[10px] font-black uppercase tracking-widest rounded-md border border-success/30">Protocolo de Enfermagem</span>
-                    </div>
-                    <div className="p-4 bg-bg rounded-2xl border border-border/50">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-accent mb-2">O que é?</p>
-                      <p className="text-sm text-text-primary leading-relaxed">{entry.whatIs || entry.definition}</p>
-                    </div>
-                    
-                    <div className="p-4 bg-success/5 rounded-2xl border border-success/20">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-success mb-2">Como medir?</p>
-                      <p className="text-sm text-text-secondary leading-relaxed font-medium">{entry.howToMeasure || 'Procedimento em revisão conforme protocolos institucionais.'}</p>
-                    </div>
-                  </div>
                 )}
-            </motion.div>
-          ))
+              </motion.div>
+            );
+          })
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center opacity-30">
             <Search className="w-16 h-16 mb-4" />
