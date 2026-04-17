@@ -1228,4 +1228,121 @@ Sempre iniciar da parte mais **distal** para a **proximal** (mão -> antebraço 
       { id: 'qac_5', question: 'O garroteamento serve para:', options: ['Parar o sangue arterial', 'Engurgitar a veia e facilitar a punção', 'Causar dor', 'Não tem utilidade'], correctAnswerIndex: 1 }
     ]
   }
+    ]
+  },
+  {
+    id: 'l_vacinas',
+    moduleId: 'k1',
+    title: 'Calendário Vacinal (0 a 1 ano)',
+    order: 1,
+    content: `
+# Calendário Nacional de Vacinação
+
+Fundamental para a saúde pública pediátrica. 
+
+## Principais Vacinas (0-6 meses)
+- **Ao Nascer:** BCG (Tuberculose) e Hepatite B.
+- **2 meses:** Penta (Difteria, Tétano, Coqueluche, Hep B, Hib), VIP (Poliomielite inativada), Vorh (Rotavírus) e Pneumo 10.
+- **3 meses:** Meningo C.
+- **4 meses:** Segunda dose da Penta, VIP, Vorh e Pneumo 10.
+- **5 meses:** Segunda dose da Meningo C.
+- **6 meses:** Terceira dose da Penta e VIP.
+
+## Via de Administração
+A maioria das vacinas do calendário são **Intramusculares (IM)** ou **Orais (VO)**. A BCG é **Intradérmica (ID)**.
+`,
+    questions: [
+      { id: 'qvac_1', question: 'Qual vacina deve ser administrada imediatamente ao nascer?', options: ['Penta', 'Rotavírus', 'BCG e Hepatite B', 'Gripe'], correctAnswerIndex: 2 },
+      { id: 'qvac_2', question: 'A via de administração da vacina BCG é:', options: ['Subcutânea', 'Intradérmica', 'Intramuscular', 'Oral'], correctAnswerIndex: 1 },
+      { id: 'qvac_3', question: 'A vacina Pentavalente protege contra quais doenças?', options: ['Gripe e Resfriado', 'Difteria, Tétano, Coqueluche, Hepatite B e Hib', 'Apenas Tétano', 'Caxumba e Rubéola'], correctAnswerIndex: 1 },
+      { id: 'qvac_4', question: 'A vacina contra o Rotavírus (Vorh) é administrada por qual via?', options: ['IM', 'ID', 'Oral (VO)', 'Inalatória'], correctAnswerIndex: 2 },
+      { id: 'qvac_5', question: 'A VIP protege contra qual doença?', options: ['Sarampo', 'Poliomielite', 'Varicela', 'Dengue'], correctAnswerIndex: 1 }
+    ]
+  },
+  {
+    id: 'l_pezinho',
+    moduleId: 'k1',
+    title: 'Triagem Neonatal (Teste do Pezinho)',
+    order: 2,
+    content: `
+# Teste do Pezinho
+
+O Teste do Pezinho é uma ação preventiva que permite o diagnóstico precoce de diversas doenças.
+
+## Período Ideal
+Deve ser realizado entre o **3º e o 5º dia de vida** do recém-nascido. Não deve ser feito antes de 48h de vida (devido à necessidade de ingestão de proteínas do leite).
+
+## Doenças Detectadas pelo PNTN
+1. **Fenilcetonúria**: Erro inato do metabolismo.
+2. **Hipotireoidismo Congênito**: Causa deficiência mental se não tratado.
+3. **Doença Falciforme**: Alterações na hemoglobina.
+4. **Fibrose Cística**: Afeta pulmões e pâncreas.
+5. **Hiperplasia Adrenal Congênita**.
+6. **Deficiência de Biotinidase**.
+`,
+    questions: [
+      { id: 'qpez_1', question: 'Qual o período ideal para coleta do Teste do Pezinho?', options: ['Ao nascer', 'Do 3º ao 5º dia de vida', 'Apenas após 1 mês', 'Em qualquer dia'], correctAnswerIndex: 1 },
+      { id: 'qpez_2', question: 'Por que não se deve coletar antes de 48h de vida?', options: ['O bebê sente muita dor', 'Necessidade de ingestão prévia de leite para detectar erros metabólicos', 'O pezinho é muito mole', 'Não há motivo'], correctAnswerIndex: 1 },
+      { id: 'qpez_3', question: 'O Hipotireoidismo Congênito, se não tratado, pode levar a:', options: ['Cegueira', 'Deficiência Mental', 'Surdez', 'Nada'], correctAnswerIndex: 1 },
+      { id: 'qpez_4', question: 'A Doença Falciforme afeta qual estrutura?', options: ['Pele', 'Hemoglobina (Células do sangue)', 'Ossos', 'Músculos'], correctAnswerIndex: 1 },
+      { id: 'qpez_5', question: 'O Teste do Pezinho é uma triagem ou um diagnóstico definitivo?', options: ['Diagnóstico definitivo', 'Triagem (precisa de confirmação se der alterado)', 'Apenas uma pesquisa', 'Não serve para nada'], correctAnswerIndex: 1 }
+    ]
+  },
+  {
+    id: 'l_calc',
+    moduleId: 'p1',
+    title: 'Cálculo de Gotejamento',
+    order: 1,
+    content: `
+# Cálculo de Gotas e Microgotas
+
+Essencial para a infusão precisa de soros e medicamentos.
+
+## Fórmulas de Gotas (por hora)
+**Gotas/min = Volume / (Tempo x 3)**
+
+## Fórmulas de Microgotas (por hora)
+**Microgotas/min = Volume / Tempo**
+
+## Relação Importante
+- 1 gota = 3 microgotas.
+- 1 ml = 20 gotas.
+- 1 ml = 60 microgotas.
+`,
+    questions: [
+      { id: 'qcal_1', question: 'Prescrito 500ml de SF 0,9% para correr em 8 horas. Quantas gotas por minuto?', options: ['21 gts/min', '42 gts/min', '10 gts/min', '63 gts/min'], correctAnswerIndex: 0 },
+      { id: 'qcal_2', question: 'Qual a fórmula para cálculo de microgotas em horas?', options: ['V / (T x 3)', 'V / T', 'V x 20', 'T / V'], correctAnswerIndex: 1 },
+      { id: 'qcal_3', question: '1 ml equivale a quantas gotas (padrão)?', options: ['10 gotas', '20 gotas', '50 gotas', '100 gotas'], correctAnswerIndex: 1 },
+      { id: 'qcal_4', question: 'Quantas microgotas equivalem a 1 gota?', options: ['2', '3', '4', '5'], correctAnswerIndex: 1 },
+      { id: 'qcal_5', question: 'Se uma prescrição pede microgotas e você só tem equipo de gotas, o que fazer?', options: ['Não dá pra fazer', 'Multiplicar o valor de gotas por 3', 'Dividir o valor de gotas por 3', 'Usar o mesmo valor'], correctAnswerIndex: 1 }
+    ]
+  },
+  {
+    id: 'l_insu',
+    moduleId: 'p1',
+    title: 'Insulinas: Tipos e Ação',
+    order: 2,
+    content: `
+# Manejo de Insulinas
+
+A enfermagem é responsável pelo preparo, aplicação e orientação do uso de insulinas.
+
+## Tipos Principais
+1. **Rápida (Regular):** Aspecto límpido. Início em 30min.
+2. **Ultrarrápida (Lispro/Aspart):** Aspecto límpido. Início imediato.
+3. **Intermediária (NPH):** Aspecto leitoso (turvo). Ação por 12-18h.
+4. **Lenta (Glargina):** Sem pico de ação.
+
+## Regras de Preparo
+- NUNCA agitar o frasco de NPH, apenas rolar entre as mãos.
+- Ao misturar Regular e NPH na mesma seringa: **Aspirar a Regular (Límpida) primeiro.**
+`,
+    questions: [
+      { id: 'qins_1', question: 'Qual o aspecto visual da Insulina NPH?', options: ['Límpido (transparente)', 'Leitoso (turvo)', 'Rosa', 'Azul'], correctAnswerIndex: 1 },
+      { id: 'qins_2', question: 'Qual insulina pode ser administrada por via Intravenosa em urgências?', options: ['NPH', 'Regular', 'Glargina', 'Nenhuma'], correctAnswerIndex: 1 },
+      { id: 'qins_3', question: 'Ao aspirar Regular e NPH na mesma seringa, qual a ordem?', options: ['NPH primeiro', 'Regular primeiro', 'Tanto faz', 'Não pode misturar'], correctAnswerIndex: 1 },
+      { id: 'qins_4', question: 'Quanto tempo antes da refeição deve-se aplicar a insulina Regular?', options: ['Imediatamente após', '30 minutos antes', '2 horas antes', 'Durante a refeição'], correctAnswerIndex: 1 },
+      { id: 'qins_5', question: 'Qual técnica deve ser usada para homogeneizar a insulina NPH?', options: ['Agitar vigorosamente', 'Rolar o frasco suavemente entre as mãos', 'Aquecer no micro-ondas', 'Usar um liquidificador'], correctAnswerIndex: 1 }
+    ]
+  }
 ];

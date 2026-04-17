@@ -72,6 +72,36 @@ export const DICTIONARY: DictionaryEntry[] = [
     details: 'Realizada em emergências de hemorragia pós-parto para estimular a contração do útero.',
     requiredLessonId: 'l_hem_pos'
   }
+    requiredLessonId: 'l_hem_pos'
+  },
+  {
+    term: 'PALS',
+    definition: 'Pediatric Advanced Life Support.',
+    category: 'sigla',
+    details: 'Suporte Avançado de Vida em Pediatria. Foca no manejo de PCR em crianças e bebês.'
+  },
+  {
+    term: 'APGAR',
+    definition: 'Escala de vitalidade do recém-nascido.',
+    category: 'escala',
+    whatIs: 'Avalia a adaptação do bebê à vida extrauterina.',
+    howToMeasure: 'Realizada no 1º e 5º minuto de vida. Avalia FC, Esforço Respiratório, Tônus, Irritabilidade e Cor.',
+    requiredLevel: 2
+  },
+  {
+    term: 'VPP',
+    definition: 'Ventilação por Pressão Positiva.',
+    category: 'sigla',
+    details: 'Principal manobra de reanimação neonatal em sala de parto.'
+  },
+  {
+    term: 'RCP Pediátrica',
+    definition: 'Ressuscitação Cardiopulmonar em Crianças.',
+    category: 'escala',
+    whatIs: 'Técnica de reanimação adaptada ao tamanho e fisiologia da criança.',
+    howToMeasure: 'Em bebês: Dois dedos no centro do tórax ou técnica dos dois polegares. Em crianças: 1 ou 2 mãos conforme o porte.',
+    requiredLevel: 3
+  }
 ];
 
 // Mantendo SCALES para compatibilidade se necessário, mas unificando no DICTIONARY

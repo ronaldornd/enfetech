@@ -17,7 +17,13 @@ import {
   Shield,
   ShieldCheck,
   Globe,
-  CirclePlay
+  CirclePlay,
+  Baby,
+  FlaskConical,
+  Stethoscope,
+  Timer,
+  Activity,
+  Heart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -64,43 +70,85 @@ const ModuleCard = ({ module, onClick }: { module: Module; onClick: () => void; 
       case 'Calculator': return Calculator;
       case 'Globe': return Globe;
       case 'Zap': return Zap;
+      case 'Baby': return Baby;
+      case 'FlaskConical': return FlaskConical;
+      case 'Stethoscope': return Stethoscope;
       default: return BookOpen;
     }
   }, [module.icon]);
 
   return (
-    <motion.button 
-      whileHover={{ scale: 1.02 }}
+    <motion.button
+      whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => {
         haptics.light();
         onClick();
       }}
-      className="w-full text-left bg-surface p-5 rounded-3xl shadow-sm border border-border group transition-all hover:border-accent hover:bg-surface-hover"
+      className="w-full bg-surface p-5 rounded-[32px] border border-border flex items-center gap-5 text-left transition-all hover:bg-surface-hover hover:shadow-xl hover:shadow-accent/5 group relative overflow-hidden"
     >
-      <div className="flex justify-between items-start mb-4">
-        <div className="p-3 bg-bg rounded-2xl group-hover:bg-accent/10 transition-colors">
-          <Icon className="w-6 h-6 text-text-secondary group-hover:text-accent" />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-accent/10 blur-3xl rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-150" />
+      <CircularProgress progress={module.progress} color={module.progress === 100 ? '#00b894' : '#6C5CE7'} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <Icon className="w-4 h-4 text-accent" />
+          <h3 className="font-bold text-base text-text-primary truncate">{module.title}</h3>
         </div>
-        <div className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">
-          {module.progress}%
-        </div>
+        <p className="text-xs text-text-secondary line-clamp-1">{module.description}</p>
       </div>
-      <h3 className="font-bold text-lg mb-1 text-text-primary">{module.title}</h3>
-      <p className="text-sm text-text-secondary line-clamp-2">{module.description}</p>
-      
-      <div className="mt-4 w-full bg-bg h-1.5 rounded-full overflow-hidden">
-        <motion.div 
-          initial={{ width: 0 }}
-          animate={{ width: `${module.progress}%` }}
-          className="bg-accent h-full rounded-full"
-        />
+      <div className="p-2 bg-bg rounded-xl text-text-secondary group-hover:text-accent group-hover:bg-accent/10 transition-colors">
+        <ChevronRight className="w-5 h-5" />
       </div>
     </motion.button>
   );
 };
+  return dateStr;
+};
 
-export default function App() {
+const getCareerTitle = (level: number) => {
+  if (level >= 10) return 'Enfermeiro Especialista';
+  if (level >= 6) return 'Enfermeiro Júnior';
+  if (level >= 3) return 'Interno de Enfermagem';
+  return 'Acadêmico de Enfermagem';
+};
+
+const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5CE7' }: { progress: number, size?: number, strokeWidth?: number, color?: string }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="relative group/circle" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          className="text-border/20"
+        />
+        <motion.circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={color}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          strokeLinecap="round"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-[10px] font-black group-hover/circle:scale-110 transition-transform">{Math.round(progress)}%</span>
+      </div>
+    </div>
+  );
+};
   const [activeTab, setActiveTab] = useState<'home' | 'learn' | 'sim' | 'tools' | 'profile'>('home');
   const [showCalculator, setShowCalculator] = useState(false);
   const [showFlashcards, setShowFlashcards] = useState<{ show: boolean, moduleId?: string }>({ show: false });
@@ -130,6 +178,25 @@ export default function App() {
   const [showAchievement, setShowAchievement] = useState<{ show: boolean, title: string, subtitle: string, icon: any } | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showNotification, setShowNotification] = useState<{ show: boolean, title: string, subtitle: string, type: 'success' | 'error' | 'info' } | null>(null);
+
+  // Simulation Stress States
+  const [stability, setStability] = useState(100);
+  const [simulationTime, setSimulationTime] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
+
+  // Simulation Timer Effect
+  useEffect(() => {
+    let interval: any;
+    if (timerActive) {
+      interval = setInterval(() => {
+        setSimulationTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      setSimulationTime(0);
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [timerActive]);
 
   // Load state from storage
   useEffect(() => {
@@ -429,9 +496,12 @@ export default function App() {
             >
               <Search className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-2 bg-accent text-white px-3 py-1.5 rounded-2xl shadow-lg">
-              <Award className="w-4 h-4 text-white" />
-              <span className="text-sm font-bold">Nível {level}</span>
+            <div className="flex flex-col items-end">
+              <div className="flex items-center gap-2 bg-gradient-to-r from-accent to-[#8E44AD] text-white px-3 py-1.5 rounded-2xl shadow-lg ring-1 ring-white/20">
+                <Award className="w-4 h-4 text-white" />
+                <span className="text-sm font-bold">Nível {level}</span>
+              </div>
+              <span className="text-[9px] font-black uppercase text-accent mt-1 tracking-tighter opacity-80">{getCareerTitle(level)}</span>
             </div>
           </div>
         </div>
@@ -463,7 +533,29 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               className="space-y-6"
             >
-              {/* Daily Goals */}
+              {/* Daily Goals Card */}
+              <motion.div 
+                whileHover={{ y: -5 }}
+                className="bg-gradient-to-br from-[#2D3436] to-[#000000] p-6 rounded-[40px] border border-white/10 relative overflow-hidden shadow-2xl group"
+              >
+                <div className="absolute top-0 right-0 w-40 h-40 bg-accent/20 blur-[100px] -mr-20 -mt-20 group-hover:bg-accent/40 transition-colors" />
+                <div className="relative z-10 flex justify-between items-center">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">Desafio Diário</p>
+                    <h3 className="text-2xl font-black text-white italic">Domine a Farmaco!</h3>
+                    <p className="text-white/60 text-xs font-medium">Complete 2 lições de Cálculo e ganhe 500 XP bônus.</p>
+                  </div>
+                  <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl">
+                    <Zap className="w-7 h-7 text-accent fill-accent" />
+                  </div>
+                </div>
+                <div className="mt-6 flex gap-2">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className={`h-1.5 flex-1 rounded-full ${i === 1 ? 'bg-accent shadow-[0_0_10px_#6C5CE7]' : 'bg-white/10'}`} />
+                  ))}
+                </div>
+              </motion.div>
+
               <div className="grid grid-cols-2 gap-3">
                 <StatCard label="Flashcards" value={FLASHCARDS.length.toString()} icon={Zap} colorClass="bg-warning/10 text-warning" />
                 <StatCard label="Procedimentos" value={POPS.length.toString()} icon={Shield} colorClass="bg-success/10 text-success" />
@@ -953,39 +1045,58 @@ function SimulatorsView({ completedScenarios, onScenarioComplete, onFail }: { co
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-surface p-8 rounded-[40px] border border-border text-center space-y-6"
+          className="bg-surface p-8 rounded-[40px] border border-border text-center space-y-6 relative overflow-hidden"
         >
-          <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${result.isCorrect ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+          {!result.isCorrect && <div className="absolute inset-0 bg-red-500/5 animate-pulse" />}
+          <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center relative z-10 ${result.isCorrect ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
             {result.isCorrect ? <Award className="w-10 h-10" /> : <Shield className="w-10 h-10" />}
           </div>
-          <div>
+          <div className="relative z-10">
             <h3 className="text-2xl font-black mb-2">{result.isCorrect ? 'Excelente Conduta!' : 'Atenção aos Riscos'}</h3>
             <p className="text-text-secondary leading-relaxed">{result.feedback}</p>
           </div>
           <button 
             onClick={() => {
+              const prevActive = activeScenario;
               setActiveScenario(null);
               setResult(null);
-              if (result.isCorrect && activeScenario) {
-                onScenarioComplete(activeScenario);
+              setStability(100);
+              setTimerActive(false);
+              if (result.isCorrect && prevActive) {
+                onScenarioComplete(prevActive);
               } else {
                 onFail();
               }
             }}
-            className="w-full bg-accent text-white py-4 rounded-2xl font-bold transition-all hover:shadow-lg hover:shadow-accent/20 active:scale-95"
+            className={`w-full py-4 rounded-2xl font-bold transition-all hover:shadow-lg active:scale-95 relative z-10 ${result.isCorrect ? 'bg-accent text-white shadow-accent/20' : 'bg-warning text-white shadow-warning/20'}`}
           >
-            Finalizar Simulação
+            {result.isCorrect ? 'Finalizar Simulação' : 'Tentar Novamente'}
           </button>
         </motion.div>
       ) : (
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-surface p-6 rounded-3xl border-2 border-accent shadow-2xl space-y-6"
+          className="bg-surface p-6 rounded-3xl border-2 border-accent shadow-2xl space-y-6 relative overflow-hidden"
         >
+          {/* Stability Bar */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-border">
+            <motion.div 
+              initial={{ width: '100%' }}
+              animate={{ width: `${stability}%` }}
+              className={`h-full ${stability > 50 ? 'bg-success' : stability > 20 ? 'bg-warning' : 'bg-red-500 shadow-[0_0_10px_#ef4444]'}`}
+            />
+          </div>
+
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-accent bg-accent/10 px-2 py-1 rounded">Simulação Ativa</span>
-            <button onClick={() => setActiveScenario(null)} className="text-text-secondary font-bold hover:text-text-primary">Sair</button>
+            <div className="flex items-center gap-2">
+               <Activity className={`w-4 h-4 ${stability > 50 ? 'text-success' : 'text-red-500 animate-pulse'}`} />
+               <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary">Estabilidade: {stability}%</span>
+            </div>
+            <div className="flex items-center gap-2 text-warning">
+              <Timer className="w-4 h-4" />
+              <span className="text-xs font-bold tabular-nums">{Math.floor(simulationTime / 60)}:{(simulationTime % 60).toString().padStart(2, '0')}</span>
+            </div>
           </div>
           
           <div className="space-y-4">
@@ -995,15 +1106,26 @@ function SimulatorsView({ completedScenarios, onScenarioComplete, onFail }: { co
                 <button
                   key={idx}
                   onClick={() => {
+                    if (!opt.isCorrect) {
+                      const penalty = 25;
+                      const newStability = Math.max(0, stability - penalty);
+                      setStability(newStability);
+                      if (newStability <= 0) {
+                        setResult({ feedback: "A estabilidade do paciente zerou devido a condutas inadequadas.", isCorrect: false });
+                        return;
+                      }
+                    }
+
                     if (opt.isEnding || !opt.nextStepId) {
                       setResult({ feedback: opt.feedback, isCorrect: opt.isCorrect });
                     } else {
                       setCurrentStepId(opt.nextStepId);
                     }
                   }}
-                  className="w-full text-left p-4 rounded-2xl border border-border hover:border-accent hover:bg-surface-hover transition-all font-medium text-text-primary"
+                  className="w-full text-left p-4 rounded-2xl border border-border hover:border-accent hover:bg-surface-hover transition-all font-medium text-text-primary group flex justify-between items-center"
                 >
-                  {opt.text}
+                   <span>{opt.text}</span>
+                   <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
                 </button>
               ))}
             </div>
@@ -1030,7 +1152,12 @@ function ProfileView({ xp, level, name, lostPatients, onReset, completedLessons,
         </div>
         <div className="text-center">
           <h2 className="text-xl font-bold text-text-primary">{name}</h2>
-          <p className="text-text-secondary font-medium lowercase">@{name.toLowerCase().replace(/\s+/g, '.')}</p>
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-text-secondary font-medium lowercase">@{name.toLowerCase().replace(/\s+/g, '.')}</p>
+            <span className="text-[10px] font-black uppercase text-accent bg-accent/10 px-3 py-1 rounded-full mt-1 border border-accent/20">
+              {getCareerTitle(level)}
+            </span>
+          </div>
         </div>
       </div>
 

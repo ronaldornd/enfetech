@@ -455,4 +455,49 @@ export const FLASHCARDS: Flashcard[] = [
     answer: 'Atonia Uterina (Problema no Tônus). Corresponde a 70% dos casos.',
     requiredLessonId: 'l_hem_pos'
   }
+    answer: 'Atonia Uterina (Problema no Tônus). Corresponde a 70% dos casos.',
+    requiredLessonId: 'l_hem_pos'
+  },
+  {
+    id: 'f-ped-1',
+    moduleId: 'k1',
+    question: 'Qual a diferença entre VIP e VOP?',
+    answer: 'VIP é a vacina Inativada (Injetável) e VOP é a vacina Oral (Atenuada).',
+    requiredLessonId: 'l_vacinas'
+  },
+  {
+    id: 'f-ped-2',
+    moduleId: 'k1',
+    question: 'Onde deve ser aplicada a vacina BCG?',
+    answer: 'No braço direito, por via intradérmica.',
+    requiredLessonId: 'l_vacinas'
+  },
+  {
+    id: 'f-ped-3',
+    moduleId: 'k1',
+    question: 'Quais os dias recomendados para o Teste do Pezinho?',
+    answer: 'Entre o 3º e o 5º dia de vida.',
+    requiredLessonId: 'l_pezinho'
+  },
+  {
+    id: 'f-far-1',
+    moduleId: 'p1',
+    question: 'Qual a fórmula para cálculo de gotas por minuto (em horas)?',
+    answer: 'Volume / (Tempo x 3).',
+    requiredLessonId: 'l_calc'
+  },
+  {
+    id: 'f-far-2',
+    moduleId: 'p1',
+    question: '1 ml equivale a quantas microgotas?',
+    answer: '60 microgotas.',
+    requiredLessonId: 'l_calc'
+  },
+  {
+    id: 'f-far-3',
+    moduleId: 'p1',
+    question: 'Qual insulina tem aspecto leitoso?',
+    answer: 'NPH (Ação intermediária).',
+    requiredLessonId: 'l_insu'
+  }
 ];

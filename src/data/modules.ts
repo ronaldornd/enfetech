@@ -14,7 +14,7 @@ export const MODULES: Module[] = [
     title: 'Farmacologia e Cálculos',
     type: 'pharmacology',
     description: 'Cálculo de dosagens, vias de administração e farmacocinética.',
-    icon: 'Calculator',
+    icon: 'FlaskConical',
     progress: 0
   },
   {
@@ -46,7 +46,7 @@ export const MODULES: Module[] = [
     title: 'Pediatria e Neonatologia',
     type: 'foundation',
     description: 'Desenvolvimento infantil, vacinação e patologias comuns.',
-    icon: 'BookOpen',
+    icon: 'Baby',
     progress: 0
   },
   {
