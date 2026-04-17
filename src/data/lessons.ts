@@ -1199,4 +1199,33 @@ Considerada a via mais segura para administração intramuscular em adultos e cr
       { id: 'qhoch_5', question: 'O dedo indicador aponta para qual estrutura na localização?', options: ['Umbigo', 'Pé', 'Espinha ilíaca anterossuperior', 'Escápula'], correctAnswerIndex: 2 }
     ]
   }
+    ]
+  },
+  {
+    id: 'l_acesso',
+    moduleId: 'f1',
+    title: 'Acesso Venoso Periférico',
+    order: 4,
+    content: `
+# Acesso Venoso Periférico (AVP)
+
+Procedimento fundamental para administração de terapias intravenosas.
+
+## Escolha do Dispositivo (Abocath/Insyte)
+- **14G/16G (Laranja/Cinza):** Emergências, grandes volumes, trauma.
+- **18G (Verde):** Sangue e hemoderivados, grandes volumes.
+- **20G (Rosa):** Padrão para adultos, medicações comuns.
+- **22G/24G (Azul/Amarelo):** Idosos, crianças, veias frágeis.
+
+## Locais de Escolha
+Sempre iniciar da parte mais **distal** para a **proximal** (mão -> antebraço -> fossa cubital).
+`,
+    questions: [
+      { id: 'qac_1', question: 'Qual o calibre de cateter ideal para uma emergência com trauma/choque?', options: ['24G', '22G', '14G ou 16G', '20G'], correctAnswerIndex: 2 },
+      { id: 'qac_2', question: 'Qual a ordem recomendada para escolha do sítio de punção?', options: ['Sempre no braço primeiro', 'Da região mais proximal para a distal', 'Da região mais distal para a proximal', 'Apenas no pé'], correctAnswerIndex: 2 },
+      { id: 'qac_3', question: 'O cateter de cor Rosa é de qual calibre?', options: ['18G', '22G', '20G', '24G'], correctAnswerIndex: 2 },
+      { id: 'qac_4', question: 'Qual material é usado para realizar a antissepsia da pele?', options: ['Água corrente', 'Álcool 70% ou Clorexidina alcóolica', 'Éter', 'Sabão comum'], correctAnswerIndex: 1 },
+      { id: 'qac_5', question: 'O garroteamento serve para:', options: ['Parar o sangue arterial', 'Engurgitar a veia e facilitar a punção', 'Causar dor', 'Não tem utilidade'], correctAnswerIndex: 1 }
+    ]
+  }
 ];

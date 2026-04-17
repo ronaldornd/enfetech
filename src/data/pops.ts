@@ -21,7 +21,8 @@ export const POPS: POP[] = [
       'Evitar membros com fístulas ou do lado de mastectomia.',
       'Trocar conforme protocolo institucional (geralmente 72-96h).'
     ],
-    requiredLevel: 1
+    requiredLevel: 1,
+    requiredLessonId: 'l_acesso'
   },
   {
     id: 'pop2',
@@ -42,9 +43,28 @@ export const POPS: POP[] = [
       'Não desconectar o sistema para coleta de exames.',
       'Atentar para sinais de infecção urinária (ITU).'
     ],
-    requiredLevel: 3
-  }
-    requiredLevel: 3
+    requiredLevel: 3,
+    requiredLessonId: 'l_surgical'
+  },
+  {
+    id: 'pop5',
+    title: 'Sondagem Nasogástrica (SNG)',
+    description: 'Inserção de sonda através das narinas até o estômago.',
+    category: 'Procedimentos',
+    objective: 'Drenagem de conteúdo gástrico ou administração de dietas/medicações (em curto prazo).',
+    materials: ['Sonda de Levine', 'Xilocaína gel', 'Seringa de 20ml', 'Estetoscópio', 'Fita adesiva', 'Copo com água'],
+    steps: [
+      { text: 'Medir a sonda (Nariz -> Lóbulo da orelha -> Apêndice Xifóide).', rationale: 'Garantir que a extremidade alcance o estômago.' },
+      { text: 'Lubrificar a ponta da sonda com xilocaína.', rationale: 'Facilitar a passagem e reduzir desconforto.' },
+      { text: 'Introduzir pela narina e pedir para o paciente deglutir.', rationale: 'Facilitar a entrada no esôfago e evitar via aérea.' },
+      { text: 'Verificar posicionamento (Ausculta e aspiração).', rationale: 'Evitar administração inadvertida nos pulmões.' }
+    ],
+    precautions: [
+      'Sempre realizar o teste de ausculta antes de qualquer administração.',
+      'Manter cabeceira elevada (30-45°) para evitar aspiração.'
+    ],
+    requiredLevel: 2,
+    requiredLessonId: 'l_surgical'
   },
   {
     id: 'pop3',
@@ -63,7 +83,8 @@ export const POPS: POP[] = [
       'Monitorar FC e SatO2 durante todo o processo.',
       'Sempre aspirar a boca APÓS o tubo, nunca o contrário com a mesma sonda.'
     ],
-    requiredLevel: 4
+    requiredLevel: 4,
+    requiredLessonId: 'l_acesso'
   },
   {
     id: 'pop4',
