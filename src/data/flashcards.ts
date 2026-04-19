@@ -544,5 +544,45 @@ export const FLASHCARDS: Flashcard[] = [
     answer: '20 gotas (ou 60 microgotas).',
     tags: ['Cálculos', 'Revisão'],
     requiredLessonId: 'l_calc_drop'
+  },
+  {
+    id: 'fc74',
+    moduleId: 'c5',
+    question: 'Qual a diferença entre urgência e emergência e as respectivas cores no Protocolo de Manchester?',
+    answer: 'Emergência (Vermelho) = Risco IMEDIATO de morte, atendimento tempo zero. Urgência (Amarelo) = Condição grave, atendimento em até 60 min. (Excluindo a categoria Muito Urgente - Laranja que é 10min).',
+    tags: ['Urgência', 'Manchester'],
+    requiredLessonId: 'l11'
+  },
+  {
+    id: 'fc75',
+    moduleId: 'p18',
+    question: 'Defina Fibrilação Ventricular (FV) no ECG.',
+    answer: 'Ritmo totalmente caótico e irregular do ventrículo sem linha isoelétrica ou complexos QRS definidos. Requer DESFIBRILAÇÃO imediata.',
+    tags: ['Emergência', 'ECG', 'Críticos'],
+    requiredLessonId: 'l4'
+  },
+  {
+    id: 'fc76',
+    moduleId: 'p18',
+    question: 'O que se faz em caso de Assistolia?',
+    answer: 'Checar protocolo da "Linha Reta" (CAG: Cabos, Ganhos e Derivação). É um ritmo não chocável. Iniciar manobras de RCP e administrar Epinefrina 1mg a cada 3-5 minutos.',
+    tags: ['Emergência', 'ECG', 'Críticos'],
+    requiredLessonId: 'l4'
+  },
+  {
+    id: 'fc77',
+    moduleId: 'p17',
+    question: 'Qual a unidade de medição padrão nas programação de uma BIC (Bomba de Infusão)?',
+    answer: 'A programação é feita inserindo o VTBI (Volume total em mililitros) e a Taxa que medimos em mL/h (Mililitros por Hora).',
+    tags: ['Cálculos', 'BIC'],
+    requiredLessonId: 'l2'
+  },
+  {
+    id: 'fc78',
+    moduleId: 'c5',
+    question: 'Como diagnosticar uma Alcalose Metabólica na Gasometria?',
+    answer: 'pH acima de 7.45 (Alcalose) combinado com um HCO3 acima de 26 mEq/L (indicador metabólico alto).',
+    tags: ['Gasometria', 'Laboratório'],
+    requiredLessonId: 'l2'
   }
 ];

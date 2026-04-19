@@ -105,5 +105,26 @@ export const PILLS: Pill[] = [
     category: 'Laboratório',
     duration: 3,
     content: 'Azul: Citrato (Coagulação). Vermelho/Amarelo: Seco/Gel (Bioquímica). Verde: Heparina. Roxo: EDTA (Hemograma). Cinza: Fluoreto (Glicose).'
+  },
+  {
+    id: 'p16',
+    title: 'Protocolo de Manchester',
+    category: 'Urgência',
+    duration: 6,
+    content: 'Classificação de risco: VERMELHO = Emergência absoluta (0 min, via aérea, choque, sangramento massivo). LARANJA = Muito Urgente (10 min, dor coronariana, déficits neurológicos súbitos). AMARELO = Urgente (60 min, infecções severas sem choque, desconforto respiratório moderado). VERDE = Pouco Urgente (120 min). AZUL = Não Urgente (240 min).'
+  },
+  {
+    id: 'p17',
+    title: 'Cálculo de Gotejamento e BIC',
+    category: 'Cálculo',
+    duration: 5,
+    content: 'Bomba de Infusão Contínua (BIC) opera em mL/h. Se pedirem "Soro 500mL em 8h", a conta é Volume / Tempo = 500/8 = 62,5 mL/h. Lembre de não arredondar medicamentos da UTI aleatoriamente.'
+  },
+  {
+    id: 'p18',
+    title: 'Arritmias Cardíacas Críticas',
+    category: 'Críticos',
+    duration: 7,
+    content: 'Ritmos Chocáveis: FV (Fibrilação Ventricular, ondas caóticas) e TV sem pulso (Taquicardia Ventricular, complexos largos, como dentes de serra). Ritmos Não-Chocáveis: Assistolia (linha reta verificada em 2 derivações) e AESP (Atividade Elétrica Sem Pulso).'
   }
 ];
