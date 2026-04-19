@@ -62,7 +62,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         name: name.trim(),
         xp: 0,
         level: 1,
-        onboardingCompleted: true
+        lostPatients: 0,
+        onboardingCompleted: true,
+        soundsEnabled: false
       });
     }
   };

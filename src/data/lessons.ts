@@ -278,7 +278,14 @@ O papel da enfermagem na educação e monitoramento é crucial nestas patologias
 - **Tipo 1:** Destruição das células beta (insulino-dependente).
 - **Tipo 2:** Resistência à insulina ou falha na secreção.
 - **Gestacional:** Intolerância à glicose iniciada na gestação.
-`
+`,
+    questions: [
+      { id: 'q7_1', question: 'Valores de PA entre 121-139 / 81-89 mmHg são considerados:', options: ['Normal', 'Pré-hipertensão', 'Hipertensão Estágio 1', 'Urgência Pressórica'], correctAnswerIndex: 1 },
+      { id: 'q7_2', question: 'Qual o valor de PA que define o Estágio 1 da Hipertensão?', options: ['120/80', '130/85', '140-159 / 90-99', '180/110'], correctAnswerIndex: 2 },
+      { id: 'q7_3', question: 'Qual tipo de Diabetes é caracterizado pela destruição das células beta (insulino-dependente)?', options: ['Tipo 1', 'Tipo 2', 'Gestacional', 'Insipidus'], correctAnswerIndex: 0 },
+      { id: 'q7_4', question: 'A Diabetes Gestacional é diagnosticada quando:', options: ['A mulher já era diabética antes', 'Há intolerância à glicose iniciada na gestação', 'O bebê nasce hipoglicêmico', 'A glicose está normal'], correctAnswerIndex: 1 },
+      { id: 'q7_5', question: 'Segundo as diretrizes, a Pressão Arterial "Ótima" é:', options: ['130/80', '≤ 120/80 mmHg', '140/90', '110/70 apenas'], correctAnswerIndex: 1 }
+    ]
   },
   {
     id: 'l8',
@@ -298,7 +305,14 @@ A Lei 10.216/2001 redirecionou o modelo assistencial do hospitalocentrismo para 
 
 ## Urgências Psiquiátricas
 O manejo deve focar no acolhimento, redução de riscos e desescalonamento verbal antes de qualquer contenção.
-`
+`,
+    questions: [
+      { id: 'q8_1', question: 'Qual lei redirecionou o modelo assistencial em saúde mental no Brasil?', options: ['Lei 8.080', 'Lei 10.216/2001', 'Lei 7.498', 'Lei de Diretrizes e Bases'], correctAnswerIndex: 1 },
+      { id: 'q8_2', question: 'O que significa a sigla CAPS?', options: ['Centro de Apoio Social', 'Centro de Atenção Psicossocial', 'Clínica de Atendimento Primário', 'Conselho de Apoio à Saúde'], correctAnswerIndex: 1 },
+      { id: 'q8_3', question: 'Qual o foco do manejo inicial em urgências psiquiátricas?', options: ['Contenção física imediata', 'Sedação profunda', 'Acolhimento e desescalonamento verbal', 'Isolamento em quarto escuro'], correctAnswerIndex: 2 },
+      { id: 'q8_4', question: 'A RAPS (Rede de Atenção Psicossocial) foi criada para:', options: ['Substituir os hospitais gerais', 'Fortalecer o modelo manicomial', 'Oferecer cuidado comunitário e humanizado', 'Apenas distribuir medicamentos'], correctAnswerIndex: 2 },
+      { id: 'q8_5', question: 'Os leitos de saúde mental devem ser estrategicamente situados em:', options: ['Manicômios', 'Hospitais Gerais', 'Escolas', 'Delegacias'], correctAnswerIndex: 1 }
+    ]
   },
   {
     id: 'l9',
@@ -328,7 +342,14 @@ Os SSVV são indicadores do estado de saúde e das funções básicas do corpo.
 ## Pressão Arterial (PA)
 - Ótima: < 120/80 mmHg.
 - Hipertensão: ≥ 140/90 mmHg.
-`
+`,
+    questions: [
+      { id: 'q9_1', question: 'Qual a faixa de frequência cardíaca para normocardia no adulto?', options: ['40-60 bpm', '60-100 bpm', '100-140 bpm', '50-80 bpm'], correctAnswerIndex: 1 },
+      { id: 'q9_2', question: 'Uma temperatura corporal de 37,5°C é classificada como:', options: ['Afebril', 'Estado Febril', 'Febre', 'Hipertermia grave'], correctAnswerIndex: 1 },
+      { id: 'q9_3', question: 'O termo técnico para frequência respiratória acima de 20 ipm no adulto é:', options: ['Eupneia', 'Bradipneia', 'Taquipneia', 'Apneia'], correctAnswerIndex: 2 },
+      { id: 'q9_4', question: 'Um valor de pressão arterial de 145/95 mmHg é considerado:', options: ['Ótima', 'Normal', 'Hipertensão', 'Hipotensão'], correctAnswerIndex: 2 },
+      { id: 'q9_5', question: 'O que caracteriza a Bradicardia?', options: ['Frequência cardíaca > 100 bpm', 'Frequência respiratória < 12 ipm', 'Frequência cardíaca < 60 bpm', 'Pressão arterial baixa'], correctAnswerIndex: 2 }
+    ]
   },
   {
     id: 'l10',
@@ -350,7 +371,14 @@ A escolha da via depende da rapidez desejada, do tipo de fármaco e das condiç�
 - **Subcutânea (SC):** 45° ou 90°. Absorção lenta (ex: insulina).
 - **Intramuscular (IM):** 90°. Absorção rápida por ser vascularizada.
 - **Endovenosa (EV):** Efeito imediato. Risco acelerado de reações.
-`
+`,
+    questions: [
+      { id: 'q10_1', question: 'Qual via de administração evita o efeito de primeira passagem hepática?', options: ['Oral', 'Sublingual', 'Sonda Nasogástrica', 'Retal superior'], correctAnswerIndex: 1 },
+      { id: 'q10_2', question: 'Qual o ângulo recomendado para a via Intradérmica (ID)?', options: ['90°', '45°', '10° a 15°', '30°'], correctAnswerIndex: 2 },
+      { id: 'q10_3', question: 'A via subcutânea é a escolha principal para a administração de:', options: ['Antibióticos de emergência', 'Insulina e heparina', 'Vacina BCG', 'Grandes volumes de soro'], correctAnswerIndex: 1 },
+      { id: 'q10_4', question: 'Qual via parenteral oferece efeito imediato mas com maior risco de reações adversas?', options: ['Intramuscular', 'Endovenosa (EV)', 'Subcutânea', 'Intradérmica'], correctAnswerIndex: 1 },
+      { id: 'q10_5', question: 'O volume máximo recomendado para a via Intradérmica é de:', options: ['0,1 ml', '0,5 ml', '2,0 ml', '5,0 ml'], correctAnswerIndex: 1 }
+    ]
   },
   {
     id: 'l11',
@@ -372,7 +400,14 @@ O PNI é um dos maiores do mundo, garantindo acesso gratuito a vacinas essenciai
 ## Rede de Frio
 Sistema de conservação, transporte e manipulação das vacinas. Temperaturas ideais:
 - Instância local: +2°C a +8°C.
-`
+`,
+    questions: [
+      { id: 'q11_1', question: 'Quais vacinas são aplicadas aos 2 meses de vida pelo PNI?', options: ['BCG e HepB', 'Penta, VIP, VORH e Pneumo 10', 'Febre Amarela e DTP', 'Meningo C apenas'], correctAnswerIndex: 1 },
+      { id: 'q11_2', question: 'A vacina Menigo C é aplicada rotineiramente em qual mês?', options: ['Ao nascer', '2 meses', '3 meses', '6 meses'], correctAnswerIndex: 2 },
+      { id: 'q11_3', question: 'Qual a temperatura ideal da rede de frio na instância local (unidade)?', options: ['-2°C a +2°C', '0°C a +10°C', '+2°C a +8°C', '+10°C a +20°C'], correctAnswerIndex: 2 },
+      { id: 'q11_4', question: 'A vacina contra Febre Amarela entra no calendário básico aos:', options: ['2 meses', '6 meses', '9 meses', '12 meses'], correctAnswerIndex: 2 },
+      { id: 'q11_5', question: 'A 3ª dose da vacina Penta e da VIP (Poliomielite inativada) ocorre aos:', options: ['4 meses', '6 meses', '9 meses', '15 meses'], correctAnswerIndex: 1 }
+    ]
   },
   {
     id: 'l12',
@@ -392,7 +427,14 @@ Diferente do SBV, o SAV utiliza drogas, vias aéreas avançadas e monitorizaçã
 - **Adrenalina (Epinefrina):** 1mg a cada 3-5 minutos. Usada em todos os ritmos.
 - **Amiodarona:** Antiarrítmico de escolha para ritmos chocáveis refratários (300mg primeira dose).
 - **Lidocaína:** Alternativa à amiodarona.
-`
+`,
+    questions: [
+      { id: 'q12_1', question: 'Quais são os ritmos de parada cardíaca considerados chocáveis?', options: ['AESP e Assistolia', 'FV e TVSP', 'Bradicardia Sinusal', 'FA e Flutter'], correctAnswerIndex: 1 },
+      { id: 'q12_2', question: 'Qual a dose e frequência recomendada da Adrenalina na RCP avançada?', options: ['1mg a cada 1 minuto', '5mg a cada 10 minutos', '1mg a cada 3 a 5 minutos', '0,5mg apenas uma vez'], correctAnswerIndex: 2 },
+      { id: 'q12_3', question: 'A Amiodarona é o antiarrítmico de escolha para:', options: ['Ritmos não chocáveis', 'Ritmos chocáveis refratários', 'Apenas bradicardias', 'Pacientes acordados'], correctAnswerIndex: 1 },
+      { id: 'q12_4', question: 'Ritmos NÃO chocáveis incluem:', options: ['FV e TVSP', 'AESP e Assistolia', 'Taquicardia Supraventricular', 'Fibrilação Atrial'], correctAnswerIndex: 1 },
+      { id: 'q12_5', question: 'Qual droga pode ser usada como alternativa à amiodarona na parada?', options: ['Dopamina', 'Atropina', 'Lidocaína', 'Noradrenalina'], correctAnswerIndex: 2 }
+    ]
   },
   {
     id: 'l13',
@@ -414,7 +456,14 @@ O acompanhamento do trabalho de parto exige vigilância constante do bem-estar f
 - Monitorar BCF (Batimentos Cardiofetais).
 - Incentivar deambulação e métodos não farmacológicos de alívio da dor.
 - Avaliar presença de mecônio na bolsa rota.
-`
+`,
+    questions: [
+      { id: 'q13_1', question: 'O período que compreende a primeira hora após o parto, com maior risco de hemorragias, chama-se:', options: ['Dilatação', 'Expulsivo', 'Secundamento', 'Período de Greenberg'], correctAnswerIndex: 3 },
+      { id: 'q13_2', question: 'O secundamento (expulsão da placenta) deve ocorrer em qual tempo máximo estimado?', options: ['5 minutos', '30 minutos', '1 hora', '2 horas'], correctAnswerIndex: 1 },
+      { id: 'q13_3', question: 'A fase que vai de 10cm de dilatação até o nascimento do bebê é o:', options: ['Primeiro período', 'Período Expulsivo', 'Fase latente', 'Dilatação total'], correctAnswerIndex: 1 },
+      { id: 'q13_4', question: 'O que a sigla BCF significa na assistência ao parto?', options: ['Bolsa Com Fluido', 'Batimentos Cardiofetais', 'Borda Cervical Fina', 'Baixo Conteúdo Fetal'], correctAnswerIndex: 1 },
+      { id: 'q13_5', question: 'Qual destas é uma medida não farmacológica para alívio da dor no parto?', options: ['Sedação endovenosa', 'Uso de fórceps', 'Deambulação e banhos mornos', 'Repouso absoluto'], correctAnswerIndex: 2 }
+    ]
   },
   {
     id: 'l14',
@@ -435,7 +484,14 @@ Acompanhar o crescimento é essencial para detecção precoce de anomalias.
 
 ## Perímetros Cefálicos
 O crescimento do PC é reflexo do desenvolvimento cerebral. Microcefalia ou Macrocefalia devem ser investigadas prontamente.
-`
+`,
+    questions: [
+      { id: 'q14_1', question: 'Com quantos meses a criança geralmente começa a sentar sem apoio e engatinha?', options: ['4 meses', '6 meses', '9 meses', '12 meses'], correctAnswerIndex: 2 },
+      { id: 'q14_2', question: 'O perímetro cefálico (PC) é um indicador importante de qual desenvolvimento?', options: ['Ósseo', 'Pulmonar', 'Cerebral', 'Digestivo'], correctAnswerIndex: 2 },
+      { id: 'q14_3', question: 'A fase em que a criança tipicamente fica em pé e inicia os primeiros passos é:', options: ['6 meses', '9 meses', '12 meses', '18 meses'], correctAnswerIndex: 2 },
+      { id: 'q14_4', question: 'Segurar objetos deliberadamente e levá-los à boca é um marco esperado aos:', options: ['1 mês', '4 meses', '10 meses', '2 meses'], correctAnswerIndex: 1 },
+      { id: 'q14_5', question: 'Sustentar a cabeça por curtos períodos ao ser colocada de bruços ocorre aos:', options: ['Logo ao nascer', '2 meses', '6 meses', '9 meses'], correctAnswerIndex: 1 }
+    ]
   },
   {
     id: 'l15',
@@ -1077,8 +1133,6 @@ Focar na preservação da autonomia, prevenção de quedas, controle rigoroso da
       { id: 'qger_4', question: 'A imobilidade no idoso é considerada um:', options: ['Estado normal', 'Gigante da Geriatria (grande risco à saúde)', 'Sinal de descanso', 'Fator de proteção'], correctAnswerIndex: 1 },
       { id: 'qger_5', question: 'Promover a autonomia no idoso significa:', options: ['Fazer tudo por ele', 'Incentivar que ele realize suas atividades dentro de suas capacidades', 'Ignorar o idoso', 'Deixar ele sozinho na rua'], correctAnswerIndex: 1 }
     ]
-  }
-    ]
   },
   {
     id: 'l_gaso',
@@ -1167,8 +1221,6 @@ A HPP é a principal causa de morte materna evitável no mundo.
       { id: 'qhpp_4', question: 'O que a enfermagem deve priorizar na hemorragia ativa?', options: ['Apenas pesar a paciente', 'Garantir acessos calibrosos, infusão de fluidos e monitorização', 'Pedir silêncio', 'Fazer um curativo no dedo'], correctAnswerIndex: 1 },
       { id: 'qhpp_5', question: 'O uso de Ácido Tranexâmico serve para:', options: ['Aumentar o leite', 'Ajudar na coagulação e reduzir sangramento', 'Causar sono', 'Nada'], correctAnswerIndex: 1 }
     ]
-  }
-    ]
   },
   {
     id: 'l_hoch',
@@ -1198,8 +1250,6 @@ Considerada a via mais segura para administração intramuscular em adultos e cr
       { id: 'qhoch_4', question: 'A técnica de Hochstetter foca em qual região muscular?', options: ['Deltóide', 'Vasto lateral', 'Ventro-glútea', 'Dorso-glútea'], correctAnswerIndex: 2 },
       { id: 'qhoch_5', question: 'O dedo indicador aponta para qual estrutura na localização?', options: ['Umbigo', 'Pé', 'Espinha ilíaca anterossuperior', 'Escápula'], correctAnswerIndex: 2 }
     ]
-  }
-    ]
   },
   {
     id: 'l_acesso',
@@ -1226,8 +1276,6 @@ Sempre iniciar da parte mais **distal** para a **proximal** (mão -> antebraço 
       { id: 'qac_3', question: 'O cateter de cor Rosa é de qual calibre?', options: ['18G', '22G', '20G', '24G'], correctAnswerIndex: 2 },
       { id: 'qac_4', question: 'Qual material é usado para realizar a antissepsia da pele?', options: ['Água corrente', 'Álcool 70% ou Clorexidina alcóolica', 'Éter', 'Sabão comum'], correctAnswerIndex: 1 },
       { id: 'qac_5', question: 'O garroteamento serve para:', options: ['Parar o sangue arterial', 'Engurgitar a veia e facilitar a punção', 'Causar dor', 'Não tem utilidade'], correctAnswerIndex: 1 }
-    ]
-  }
     ]
   },
   {
@@ -1343,6 +1391,109 @@ A enfermagem é responsável pelo preparo, aplicação e orientação do uso de 
       { id: 'qins_3', question: 'Ao aspirar Regular e NPH na mesma seringa, qual a ordem?', options: ['NPH primeiro', 'Regular primeiro', 'Tanto faz', 'Não pode misturar'], correctAnswerIndex: 1 },
       { id: 'qins_4', question: 'Quanto tempo antes da refeição deve-se aplicar a insulina Regular?', options: ['Imediatamente após', '30 minutos antes', '2 horas antes', 'Durante a refeição'], correctAnswerIndex: 1 },
       { id: 'qins_5', question: 'Qual técnica deve ser usada para homogeneizar a insulina NPH?', options: ['Agitar vigorosamente', 'Rolar o frasco suavemente entre as mãos', 'Aquecer no micro-ondas', 'Usar um liquidificador'], correctAnswerIndex: 1 }
+    ]
+  },
+  {
+    id: 'l_uti_pam',
+    moduleId: 'c1',
+    order: 6,
+    title: 'Monitoração Hemodinâmica: PAM',
+    content: `
+# Monitoração de Pressão Arterial Média (PAM)
+
+A monitoração invasiva da PA é o padrão-ouro em UTIs para pacientes instáveis.
+
+## Por que a PAM é importante?
+Diferente da PA sistólica isolada, a PAM representa a **Pressão de Perfusão Orgânica**. 
+
+> [!IMPORTANT]
+> O valor alvo geralmente é **PAM >= 65 mmHg**. Abaixo disso, há risco de hipoperfusão tecidual e falência de órgãos.
+
+## Componentes do Sistema
+1. **Cateter**: Geralmente na Artéria Radial (Teste de Allen obrigatório!).
+2. **Transdutor**: Converte a pressão mecânica em sinal elétrico.
+3. **Domus (Equipo)**: Deve ser preenchido com SF 0,9% e mantido sob pressão (bolsa pressurizadora a 300 mmHg).
+
+## Cuidados de Enfermagem
+- **Zerar o Sistema**: Deve ser feito a cada plantão ou mudança de decúbito.
+- **Nivelamento**: O transdutor deve estar no **Eixo Flebostático** (4º espaço intercostal, linha axilar média).
+- **Curva de Pressão**: Observar o "nó dicrótico" que indica o fechamento da valva aórtica. Uma curva achatada (overdamped) pode indicar bolhas ou dobras.
+    `,
+    questions: [
+      { id: 'qpam_1', question: 'Qual o valor alvo mínimo de PAM para garantir perfusão orgânica?', options: ['40 mmHg', '65 mmHg', '120 mmHg', '90 mmHg'], correctAnswerIndex: 1 },
+      { id: 'qpam_2', question: 'Onde deve ser posicionado o transdutor de pressão?', options: ['No nível da cabeça', 'No nível da cintura', 'No eixo flebostático', 'No chão'], correctAnswerIndex: 2 },
+      { id: 'qpam_3', question: 'Qual teste deve ser feito antes da pulsão arterial radial?', options: ['Teste de Braden', 'Teste de Phalen', 'Teste de Allen', 'Teste de Romberg'], correctAnswerIndex: 2 },
+      { id: 'qpam_4', question: 'O que indica uma curva de PAM "achatada" no monitor?', options: ['Pressão muito alta', 'Bom funcionamento', 'Ar no sistema ou dobras', 'Paciente acordado'], correctAnswerIndex: 2 },
+      { id: 'qpam_5', question: 'A bolsa pressurizadora do equipo de PAM deve ser mantida em qual pressão?', options: ['100 mmHg', '200 mmHg', '300 mmHg', '500 mmHg'], correctAnswerIndex: 2 }
+    ]
+  },
+  {
+    id: 'l_ped_marks',
+    moduleId: 'k1',
+    order: 4,
+    title: 'Marcos do Desenvolvimento Infantil',
+    content: `
+# O Crescimento e Desenvolvimento (CD)
+
+A Enfermagem desempenha papel crucial na puericultura, vigiando o desenvolvimento neuropsicomotor.
+
+## Marcos Principais
+- **2 meses**: Sorriso social, sustenta a cabeça por curtos períodos.
+- **4 meses**: Agarra objetos, leva as mãos à boca.
+- **6 meses**: Sentar com apoio, inicia introdução alimentar.
+- **9 meses**: Engatinha, faz movimento de pinça com os dedos.
+- **12 meses**: Anda com apoio, fala as primeiras palavras (ex: mamma, pappa).
+
+## Sinais de Alerta
+- Não sustentar o pescoço aos 4 meses.
+- Não sorrir aos 3 meses.
+- Perda de habilidades já adquiridas.
+
+> [!DICA]
+> Sempre use a Caderneta da Criança para plotar o Perímetro Cefálico, Peso e Estatura nos gráficos de percentil.
+    `,
+    questions: [
+      { id: 'qped_1', question: 'Com quantos meses espera-se que o bebê apresente o sorriso social?', options: ['2 meses', '6 meses', '10 meses', 'Ao nascer'], correctAnswerIndex: 0 },
+      { id: 'qped_2', question: 'A introdução alimentar deve ser iniciada, idealmente, aos:', options: ['3 meses', '4 meses', '6 meses', '12 meses'], correctAnswerIndex: 2 },
+      { id: 'qped_3', question: 'Qual movimento motor é esperado aos 9 meses?', options: ['Correr', 'Pinça com os dedos', 'Falar frases complexas', 'Pular corda'], correctAnswerIndex: 1 },
+      { id: 'qped_4', question: 'Qual sinal é considerado de alerta no desenvolvimento?', options: ['Dormir muito', 'Chorar ao tomar vacina', 'Não sustentar o pescoço aos 4 meses', 'Não falar aos 6 meses'], correctAnswerIndex: 2 },
+      { id: 'qped_5', question: 'O que deve ser plotado rotineiramente nos gráficos da caderneta?', options: ['Apenas o peso', 'Cor dos olhos', 'Perímetro cefálico, peso e estatura', 'Número do calçado'], correctAnswerIndex: 2 }
+    ]
+  },
+  {
+    id: 'l_calc_drop',
+    moduleId: 'p1',
+    order: 4,
+    title: 'Cálculo de Gotejamento Tradicional',
+    content: `
+# Dominando o Gotejamento
+
+O cálculo correto evita sobrecarga hídrica ou infusão insuficiente.
+
+## As Fórmulas Mágicas
+
+### Para Macrogotas (Hora)
+**Gotas/min = Volume / (Tempo x 3)**
+
+### Para Microgotas (Hora)
+**Microgotas/min = Volume / Tempo**
+
+> [!IMPORTANT]
+> Lembre-se sempre:
+> **1 gota = 3 microgotas**
+> **1 ml = 20 gotas**
+> **1 ml = 60 microgotas**
+
+## Exemplo Prático
+Prescrição: SF 0,9% 500ml para correr em 8 horas.
+Cálculo: 500 / (8 x 3) = 500 / 24 = 20,8 -> **21 gotas/min**.
+    `,
+    questions: [
+      { id: 'qcalc_1', question: 'Qual a fórmula de gotas/min para tempo em horas?', options: ['V / T', 'V / (T x 3)', 'V x T / 3', 'V + T'], correctAnswerIndex: 1 },
+      { id: 'qcalc_2', question: 'Quantas microgotas equivalem a 1 gota?', options: ['1', '2', '3', '4'], correctAnswerIndex: 2 },
+      { id: 'qcalc_3', question: 'Para infundir 1000ml em 24h, quantas gotas/min são necessárias (aprox)?', options: ['14 gts/min', '28 gts/min', '42 gts/min', '10 gts/min'], correctAnswerIndex: 0 },
+      { id: 'qcalc_4', question: 'Quantos ml existem em 60 microgotas?', options: ['1 ml', '3 ml', '5 ml', '10 ml'], correctAnswerIndex: 0 },
+      { id: 'qcalc_5', question: 'Se a prescrição é de Microgotas, a fórmula simplificada é:', options: ['V / 3', 'V / T', 'V x 20', 'Volume total'], correctAnswerIndex: 1 }
     ]
   }
 ];

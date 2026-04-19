@@ -4,9 +4,9 @@ import { X, Search, Hash, FileText, Info } from 'lucide-react';
 import { DictionaryEntry } from '../types';
 import { DICTIONARY, SCALES } from '../data/index';
 
-export default function DictionaryExplorer({ onClose, initialTab = 'sigla', userLevel, completedLessons }: { onClose: () => void, initialTab?: 'sigla' | 'escala', userLevel: number, completedLessons: string[] }) {
+export default function DictionaryExplorer({ onClose, initialTab = 'sigla', initialTerm = '', userLevel, completedLessons }: { onClose: () => void, initialTab?: 'sigla' | 'escala', initialTerm?: string, userLevel: number, completedLessons: string[] }) {
   const [activeType, setActiveType] = useState<'sigla' | 'escala'>(initialTab);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialTerm);
 
   const filteredEntries = DICTIONARY.filter(entry => 
     entry.category === activeType &&

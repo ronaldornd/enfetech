@@ -7,6 +7,7 @@ export const SCENARIOS: Scenario[] = [
     description: 'Paciente com dispneia súbita e saturação em queda.',
     difficulty: 'Média',
     xpReward: 200,
+    useStability: true,
     steps: [
       {
         id: 'st1',
@@ -36,6 +37,7 @@ export const SCENARIOS: Scenario[] = [
     description: 'Identificação precoce de sinais de choque séptico.',
     difficulty: 'Alta',
     xpReward: 350,
+    useStability: true,
     steps: [
       {
         id: 'st1',
@@ -55,6 +57,7 @@ export const SCENARIOS: Scenario[] = [
     description: 'Atendimento a uma parada cardiorrespiratória em enfermaria.',
     difficulty: 'Alta',
     xpReward: 500,
+    useStability: true,
     steps: [
       {
         id: 'st1',
@@ -93,6 +96,7 @@ export const SCENARIOS: Scenario[] = [
     description: 'Manejo de crise hiperglicêmica com hálito cetônico.',
     difficulty: 'Alta',
     xpReward: 400,
+    useStability: true,
     steps: [
       {
         id: 'st1',
@@ -112,6 +116,7 @@ export const SCENARIOS: Scenario[] = [
     description: 'Reação alérgica grave após administração de medicamento.',
     difficulty: 'Alta',
     xpReward: 400,
+    useStability: true,
     steps: [
       {
         id: 'st1',
@@ -158,11 +163,8 @@ export const SCENARIOS: Scenario[] = [
           { text: 'Interromper a transfusão e manter o acesso com SF 0,9%', isCorrect: true, feedback: 'Perfeito! Segurança em primeiro lugar.' },
           { text: 'Diminuir a velocidade do gotejamento', isCorrect: false, feedback: 'Errado! Se há reação, deve parar totalmente.' },
           { text: 'Cobrir o paciente com cobertor', isCorrect: false, feedback: 'Apenas paliativo, não trata a causa.' },
-          { text: 'Continuar e observar por mais 15 min', isCorrect: false, feedback: 'Fatal. Pode evoluir para choque hemolítico.' }
         ]
       }
-    ]
-  }
     ]
   },
   {
@@ -172,45 +174,37 @@ export const SCENARIOS: Scenario[] = [
     difficulty: 'Alta',
     xpReward: 350,
     requiredLessonId: 'l_iam',
+    useStability: true,
     steps: [
       {
         id: 'iam_1',
         description: 'Paciente está pálido e ansioso. Qual sua primeira ação?',
         options: [
-          'Pedir para o paciente esperar sentado',
-          'Colocar em repouso absoluto, monitorizar e realizar o ECG em < 10min',
-          'Dar um copo de água e pedir exames de rotina',
-          'Ligar para a família primeiro'
-        ],
-        correctAnswerIndex: 1,
-        successMessage: 'Excelente! No IAM, "Tempo é Músculo". O ECG precoce é fundamental.',
-        failureMessage: 'Tempo é músculo! O ECG deve ser feito em menos de 10 minutos.'
+          { text: 'Pedir para o paciente esperar sentado', isCorrect: false, feedback: 'Tempo é músculo! O ECG deve ser feito em menos de 10 minutos.' },
+          { text: 'Colocar em repouso absoluto, monitorizar e realizar o ECG em < 10min', isCorrect: true, feedback: 'Excelente! No IAM, "Tempo é Músculo". O ECG precoce é fundamental.' },
+          { text: 'Dar um copo de água e pedir exames de rotina', isCorrect: false, feedback: 'Tempo é músculo! O ECG deve ser feito em menos de 10 minutos.' },
+          { text: 'Ligar para a família primeiro', isCorrect: false, feedback: 'Tempo é músculo! O ECG deve ser feito em menos de 10 minutos.' }
+        ]
       },
       {
         id: 'iam_2',
         description: 'O ECG confirma IAM com supra de ST. O médico prescreve o protocolo MONA. Qual destes você aplica imediatamente para efeito antiagregante?',
         options: [
-          'Morfina',
-          'Insulina',
-          'AAS 200mg mastigável',
-          'Dipirona'
-        ],
-        correctAnswerIndex: 2,
-        successMessage: 'Correto! O AAS mastigável acelera a inibição plaquetária.',
-        failureMessage: 'O AAS é a pedra angular inicial para evitar que o coágulo aumente.'
+          { text: 'Morfina', isCorrect: false, feedback: 'O AAS é a pedra angular inicial para evitar que o coágulo aumente.' },
+          { text: 'Insulina', isCorrect: false, feedback: 'O AAS é a pedra angular inicial para evitar que o coágulo aumente.' },
+          { text: 'AAS 200mg mastigável', isCorrect: true, feedback: 'Correto! O AAS mastigável acelera a inibição plaquetária.' },
+          { text: 'Dipirona', isCorrect: false, feedback: 'O AAS é a pedra angular inicial para evitar que o coágulo aumente.' }
+        ]
       },
       {
         id: 'iam_3',
         description: 'O paciente apresenta PA 85/50 mmHg. Qual cuidado é CRÍTICO agora?',
         options: [
-          'Administrar Nitrato sublingual',
-          'Não administrar Nitratos devido ao risco de choque/hipotensão grave',
-          'Pedir para o paciente caminhar para o centro cirúrgico',
-          'Fazer massagem cardíaca'
-        ],
-        correctAnswerIndex: 1,
-        successMessage: 'Perfeito! Nitratos são contraindicados em pacientes hipotensos ou com infarto de ventrículo direito.',
-        failureMessage: 'Cuidado! O Nitrato é vasodilatador e pode causar colapso circulatório em um paciente já hipotenso.'
+          { text: 'Administrar Nitrato sublingual', isCorrect: false, feedback: 'Cuidado! O Nitrato é vasodilatador e pode causar colapso circulatório em um paciente já hipotenso.' },
+          { text: 'Não administrar Nitratos devido ao risco de choque/hipotensão grave', isCorrect: true, feedback: 'Perfeito! Nitratos são contraindicados em pacientes hipotensos ou com infarto de ventrículo direito.' },
+          { text: 'Pedir para o paciente caminhar para o centro cirúrgico', isCorrect: false, feedback: 'Cuidado! O Nitrato é vasodilatador e pode causar colapso circulatório em um paciente já hipotenso.' },
+          { text: 'Fazer massagem cardíaca', isCorrect: false, feedback: 'Cuidado! O Nitrato é vasodilatador e pode causar colapso circulatório em um paciente já hipotenso.' }
+        ]
       }
     ]
   },
@@ -226,27 +220,21 @@ export const SCENARIOS: Scenario[] = [
         id: 'gas_1',
         description: 'Resultados: pH 7.28, pCO2 55, HCO3 24. Qual o distúrbio?',
         options: [
-          'Alcalose Metabólica',
-          'Acidose Respiratória',
-          'Acidose Metabólica',
-          'Gasometria Normal'
-        ],
-        correctAnswerIndex: 1,
-        successMessage: 'Correto! pH baixo com CO2 alto indica acidose respiratória (hipoventilação).',
-        failureMessage: 'Lembre-se: CO2 alto retém ácido no sangue, baixando o pH.'
+          { text: 'Alcalose Metabólica', isCorrect: false, feedback: 'Lembre-se: CO2 alto retém ácido no sangue, baixando o pH.' },
+          { text: 'Acidose Respiratória', isCorrect: true, feedback: 'Correto! pH baixo com CO2 alto indica acidose respiratória (hipoventilação).' },
+          { text: 'Acidose Metabólica', isCorrect: false, feedback: 'Lembre-se: CO2 alto retém ácido no sangue, baixando o pH.' },
+          { text: 'Gasometria Normal', isCorrect: false, feedback: 'Lembre-se: CO2 alto retém ácido no sangue, baixando o pH.' }
+        ]
       },
       {
         id: 'gas_2',
         description: 'O paciente está confuso e bradipneico. Qual a conduta de enfermagem prioritária?',
         options: [
-          'Oferecer água',
-          'Preparar material para intubação e suporte ventilatório',
-          'Aumentar o soro',
-          'Pedir novos exames para amanhã'
-        ],
-        correctAnswerIndex: 1,
-        successMessage: 'Isso mesmo! O paciente está em falência respiratória e precisa de suporte imediato.',
-        failureMessage: 'O suporte ventilatório é a única forma de lavar o excesso de CO2 e subir o pH.'
+          { text: 'Oferecer água', isCorrect: false, feedback: 'O suporte ventilatório é a única forma de lavar o excesso de CO2 e subir o pH.' },
+          { text: 'Preparar material para intubação e suporte ventilatório', isCorrect: true, feedback: 'Isso mesmo! O paciente está em falência respiratória e precisa de suporte imediato.' },
+          { text: 'Aumentar o soro', isCorrect: false, feedback: 'O suporte ventilatório é a única forma de lavar o excesso de CO2 e subir o pH.' },
+          { text: 'Pedir novos exames para amanhã', isCorrect: false, feedback: 'O suporte ventilatório é a única forma de lavar o excesso de CO2 e subir o pH.' }
+        ]
       }
     ]
   },
@@ -257,35 +245,28 @@ export const SCENARIOS: Scenario[] = [
     difficulty: 'Alta',
     xpReward: 400,
     requiredLessonId: 'l_hem_pos',
+    useStability: true,
     steps: [
       {
         id: 'hpp_1',
         description: 'O útero está acima da cicatriz umbilical e amolecido (globo de segurança ausente). Qual a primeira medida?',
         options: [
-          'Cobrir a paciente',
-          'Massagem uterina bimanual imediata (Manobra de Hamilton)',
-          'Esperar o médico chegar para tocar na paciente',
-          'Dar alta para a paciente'
-        ],
-        correctAnswerIndex: 1,
-        successMessage: 'Correto! A massagem estimula a contração mecânica do útero (tônus).',
-        failureMessage: 'A massagem bimanual é a primeira linha para estancar a atonia uterina.'
+          { text: 'Cobrir a paciente', isCorrect: false, feedback: 'A massagem bimanual é a primeira linha para estancar a atonia uterina.' },
+          { text: 'Massagem uterina bimanual imediata (Manobra de Hamilton)', isCorrect: true, feedback: 'Correto! A massagem estimula a contração mecânica do útero (tônus).' },
+          { text: 'Esperar o médico chegar para tocar na paciente', isCorrect: false, feedback: 'A massagem bimanual é a primeira linha para estancar a atonia uterina.' },
+          { text: 'Dar alta para a paciente', isCorrect: false, feedback: 'A massagem bimanual é a primeira linha para estancar a atonia uterina.' }
+        ]
       },
       {
         id: 'hpp_2',
         description: 'A massagem foi iniciada. Qual medicação deve ser preparada para infusão endovenosa rápida conforme protocolo?',
         options: [
-          'Vitamina C',
-          'Ocitocina 20 UI em 500ml de RL',
-          'Glicose 50%',
-          'Buscopan'
-        ],
-        correctAnswerIndex: 1,
-        successMessage: 'Excelente! A ocitocina é o padrão-ouro para reverter a atonia uterina.',
-        failureMessage: 'A ocitocina é fundamental para manter o útero contraído e parar o sangramento.'
+          { text: 'Vitamina C', isCorrect: false, feedback: 'A ocitocina é fundamental para manter o útero contraído e parar o sangramento.' },
+          { text: 'Ocitocina 20 UI em 500ml de RL', isCorrect: true, feedback: 'Excelente! A ocitocina é o padrão-ouro para reverter a atonia uterina.' },
+          { text: 'Glicose 50%', isCorrect: false, feedback: 'A ocitocina é fundamental para manter o útero contraído e parar o sangramento.' },
+          { text: 'Buscopan', isCorrect: false, feedback: 'A ocitocina é fundamental para manter o útero contraído e parar o sangramento.' }
+        ]
       }
-    ]
-  }
     ]
   },
   {
@@ -300,27 +281,21 @@ export const SCENARIOS: Scenario[] = [
         id: 'hoch_1',
         description: 'Qual a posição correta da mão para localizar o sítio de punção?',
         options: [
-          'Palma da mão no joelho',
-          'Palma da mão no grande trocanter do fêmur, com dedo indicador na espinha ilíaca',
-          'Qualquer lugar no glúteo',
-          'Dedo indicador no umbigo'
-        ],
-        correctAnswerIndex: 1,
-        successMessage: 'Correto! A anatomia é a chave para a segurança nesta técnica.',
-        failureMessage: 'Lembre-se: Palma no trocanter e indicador na espinha ilíaca anterossuperior.'
+          { text: 'Palma da mão no joelho', isCorrect: false, feedback: 'Lembre-se: Palma no trocanter e indicador na espinha ilíaca anterossuperior.' },
+          { text: 'Palma da mão no grande trocanter do fêmur, com dedo indicador na espinha ilíaca', isCorrect: true, feedback: 'Correto! A anatomia é a chave para a segurança nesta técnica.' },
+          { text: 'Qualquer lugar no glúteo', isCorrect: false, feedback: 'Lembre-se: Palma no trocanter e indicador na espinha ilíaca anterossuperior.' },
+          { text: 'Dedo indicador no umbigo', isCorrect: false, feedback: 'Lembre-se: Palma no trocanter e indicador na espinha ilíaca anterossuperior.' }
+        ]
       },
       {
         id: 'hoch_2',
         description: 'Onde exatamente a agulha deve ser inserida?',
         options: [
-          'Na ponta do dedo médio',
-          'No centro do "V" formado pelos dedos médio e indicador',
-          'Fora da crista ilíaca',
-          'No local com mais gordura'
-        ],
-        correctAnswerIndex: 1,
-        successMessage: 'Isso! O centro do V é a zona de segurança livre de nervos.',
-        failureMessage: 'O centro do triângulo (V) formado pelos dedos é a área alvo.'
+          { text: 'Na ponta do dedo médio', isCorrect: false, feedback: 'O centro do triângulo (V) formado pelos dedos é a área alvo.' },
+          { text: 'No centro do "V" formado pelos dedos médio e indicador', isCorrect: true, feedback: 'Isso! O centro do V é a zona de segurança livre de nervos.' },
+          { text: 'Fora da crista ilíaca', isCorrect: false, feedback: 'O centro do triângulo (V) formado pelos dedos é a área alvo.' },
+          { text: 'No local com mais gordura', isCorrect: false, feedback: 'O centro do triângulo (V) formado pelos dedos é a área alvo.' }
+        ]
       }
     ]
   }

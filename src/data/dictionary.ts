@@ -34,8 +34,6 @@ export const DICTIONARY: DictionaryEntry[] = [
     whatIs: 'Sistema de pontuação para identificar precocemente a deterioração clínica do paciente.',
     howToMeasure: 'Baseia-se em parâmetros vitais: PA Sistólica, FC, FR, Temperatura e Escala de Coma de Glasgow/AVPU.',
     requiredLevel: 3
-  }
-    requiredLevel: 3
   },
   {
     term: 'Cincinnati',
@@ -71,8 +69,6 @@ export const DICTIONARY: DictionaryEntry[] = [
     category: 'sigla',
     details: 'Realizada em emergências de hemorragia pós-parto para estimular a contração do útero.',
     requiredLessonId: 'l_hem_pos'
-  }
-    requiredLessonId: 'l_hem_pos'
   },
   {
     term: 'PALS',
@@ -101,6 +97,119 @@ export const DICTIONARY: DictionaryEntry[] = [
     whatIs: 'Técnica de reanimação adaptada ao tamanho e fisiologia da criança.',
     howToMeasure: 'Em bebês: Dois dedos no centro do tórax ou técnica dos dois polegares. Em crianças: 1 ou 2 mãos conforme o porte.',
     requiredLevel: 3
+  },
+  {
+    term: 'KPC',
+    definition: 'Klebsiella pneumoniae carbapenemase.',
+    category: 'sigla',
+    details: 'Superbactéria resistente a vários antibióticos, exigindo precaução de contato rigorosa.'
+  },
+  {
+    term: 'OMS',
+    definition: 'Organização Mundial da Saúde.',
+    category: 'sigla'
+  },
+  {
+    term: 'VDRL',
+    definition: 'Venereal Disease Research Laboratory.',
+    category: 'sigla',
+    details: 'Exame de sangue utilizado para o rastreamento da Sífilis.'
+  },
+  {
+    term: 'HIV',
+    definition: 'Vírus da Imunodeficiência Humana.',
+    category: 'sigla'
+  },
+  {
+    term: 'HAS',
+    definition: 'Hipertensão Arterial Sistêmica.',
+    category: 'sigla'
+  },
+  {
+    term: 'DM',
+    definition: 'Diabetes Mellitus.',
+    category: 'sigla'
+  },
+  {
+    term: 'RAPS',
+    definition: 'Rede de Atenção Psicossocial.',
+    category: 'sigla',
+    details: 'Conjunto de serviços do SUS para cuidado em saúde mental.'
+  },
+  {
+    term: 'SSVV',
+    definition: 'Sinais Vitais.',
+    category: 'sigla',
+    details: 'Indicadores básicos das funções vitais: PA, FC, FR, Temperatura e Dor.'
+  },
+  {
+    term: 'FV',
+    definition: 'Fibrilação Ventricular.',
+    category: 'sigla',
+    details: 'Ritmo de parada cardíaca chocável caracterizado por atividade elétrica caótica.'
+  },
+  {
+    term: 'TVSP',
+    definition: 'Taquicardia Ventricular sem pulso.',
+    category: 'sigla',
+    details: 'Ritmo de parada cardíaca chocável.'
+  },
+  {
+    term: 'AESP',
+    definition: 'Atividade Elétrica Sem Pulso.',
+    category: 'sigla',
+    details: 'Ritmo de parada cardíaca não chocável.'
+  },
+  {
+    term: 'BCF',
+    definition: 'Batimentos Cardiofetais.',
+    category: 'sigla'
+  },
+  {
+    term: 'PAV',
+    definition: 'Pneumonia Associada à Ventilação Mecânica.',
+    category: 'sigla',
+    details: 'Infecção pulmonar grave que ocorre em pacientes intubados.'
+  },
+  {
+    term: 'PNI',
+    definition: 'Programa Nacional de Imunizações.',
+    category: 'sigla'
+  },
+  {
+    term: 'AHA',
+    definition: 'American Heart Association.',
+    category: 'sigla'
+  },
+  {
+    term: 'DEA',
+    definition: 'Desfibrilador Externo Automático.',
+    category: 'sigla'
+  },
+  {
+    term: 'IM',
+    definition: 'Intramuscular.',
+    category: 'sigla'
+  },
+  {
+    term: 'EV / IV',
+    definition: 'Endovenosa / Intravenosa.',
+    category: 'sigla'
+  },
+  {
+    term: 'ID',
+    definition: 'Intradérmica.',
+    category: 'sigla'
+  },
+  {
+    term: 'SC',
+    definition: 'Subcutânea.',
+    category: 'sigla'
+  },
+  {
+    term: 'QT',
+    definition: 'Quimioterapia.',
+    category: 'sigla'
   }
 ];
 

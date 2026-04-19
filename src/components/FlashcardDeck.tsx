@@ -1,10 +1,11 @@
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Check, ArrowRight, RotateCcw, BookOpen } from 'lucide-react';
+import { X, Check, ArrowRight, RotateCcw, BookOpen, Brain, Zap, BrainCircuit } from 'lucide-react';
 import { FLASHCARDS } from '../data';
+import { SRSData, SRSGrade, isCardDue, calculateNextReview } from '../utils/srs';
 
-export default function FlashcardDeck({ onClose, moduleId, completedLessons }: { onClose: () => void, moduleId?: string, completedLessons: string[] }) {
+export default function FlashcardDeck({ onClose, moduleId, completedLessons, srsProgress, onUpdateSRS, onCorrect }: { onClose: () => void, moduleId?: string, completedLessons: string[], srsProgress: Record<string, SRSData>, onUpdateSRS: (cardId: string, data: SRSData) => void, onCorrect?: (card: any) => void }) {
   const [index, setIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
@@ -13,13 +14,32 @@ export default function FlashcardDeck({ onClose, moduleId, completedLessons }: {
     ? FLASHCARDS.filter(c => c.moduleId === moduleId)
     : FLASHCARDS;
 
-  const filteredCards = allCards.filter(c => 
-    !c.requiredLessonId || completedLessons.includes(c.requiredLessonId)
-  );
+  const filteredCards = useMemo(() => {
+    return allCards.filter(c => {
+      // Regra 1: Tem que ter feito a lição
+      if (c.requiredLessonId && !completedLessons.includes(c.requiredLessonId)) return false;
+      // Regra 2: O card precisa estar "vencido" (data de revisão <= hoje)
+      return isCardDue(srsProgress[c.id]);
+    });
+  }, [allCards, completedLessons, srsProgress]);
 
   const card = filteredCards[index];
 
-  const handleNext = () => {
+  const handleGrade = (grade: SRSGrade) => {
+    if (!card) return;
+    
+    // Calcula o novo espaçamento
+    const currentData = srsProgress[card.id];
+    const newData = calculateNextReview(grade, currentData);
+    
+    // Atualiza global
+    onUpdateSRS(card.id, newData);
+    
+    // Bateu a meta (acerou bem)?
+    if (onCorrect && grade !== 'again') {
+        onCorrect(card);
+    }
+    
     if (index < filteredCards.length - 1) {
       setIndex(index + 1);
       setShowAnswer(false);
@@ -36,9 +56,7 @@ export default function FlashcardDeck({ onClose, moduleId, completedLessons }: {
         </div>
         <h2 className="text-2xl font-bold text-text-primary">Ops!</h2>
         <p className="text-text-secondary">
-          {allCards.length > 0 
-            ? "Você precisa concluir as lições deste módulo para liberar os flashcards!" 
-            : "Ainda não temos cartões preparados para este módulo específico."}
+          Tudo atualizado! Nenhuma revisão programada para os módulos que você escolheu no momento. Seus cartões estão sendo espaçados de forma eficiente!
         </p>
         <button 
           onClick={onClose}
@@ -131,17 +149,28 @@ export default function FlashcardDeck({ onClose, moduleId, completedLessons }: {
           ) : (
             <>
                 <button 
-                  onClick={() => setShowAnswer(false)}
-                  className="p-5 bg-surface border-2 border-border text-text-secondary rounded-2xl active:scale-95 transition-all"
+                  onClick={() => handleGrade('again')}
+                  className="flex-1 p-3 bg-red-500/10 text-red-500 border border-red-500/20 rounded-2xl active:scale-95 transition-all text-sm font-bold flex flex-col items-center gap-1"
                 >
-                  <RotateCcw className="w-6 h-6" />
+                  <RotateCcw className="w-5 h-5 mb-1" />
+                  Errei
+                  <span className="text-[10px] opacity-70">&lt; 1 min</span>
                 </button>
                 <button 
-                    onClick={handleNext}
-                    className="flex-1 bg-accent text-white py-5 rounded-2xl font-bold text-lg shadow-xl flex items-center justify-center gap-2 active:scale-95 transition-all"
+                  onClick={() => handleGrade('good')}
+                  className="flex-1 p-3 bg-accent/10 border border-accent/20 text-accent rounded-2xl active:scale-95 transition-all text-sm font-bold flex flex-col items-center gap-1"
                 >
-                    Próximo Cartão
-                    <ArrowRight className="w-5 h-5" />
+                  <BrainCircuit className="w-5 h-5 mb-1" />
+                  Lembrei
+                  <span className="text-[10px] opacity-70">Bom</span>
+                </button>
+                <button 
+                    onClick={() => handleGrade('easy')}
+                    className="flex-1 p-3 bg-success/10 border border-success/20 text-success rounded-2xl active:scale-95 transition-all text-sm font-bold flex flex-col items-center gap-1"
+                >
+                    <Zap className="w-5 h-5 mb-1" />
+                    Muito Fácil
+                    <span className="text-[10px] opacity-70">Ótimo</span>
                 </button>
             </>
           )}

@@ -5,6 +5,8 @@ import { Lesson } from '../types';
 import { useState, useEffect } from 'react';
 import LessonQuiz from './LessonQuiz';
 import { haptics } from '../utils/haptics';
+import { DICTIONARY } from '../data/index';
+import { useMemo } from 'react';
 
 interface LessonViewerProps {
   lesson: Lesson;
@@ -15,6 +17,7 @@ interface LessonViewerProps {
   isLast?: boolean;
   onComplete?: () => void;
   onFail?: () => void;
+  onTermClick?: (term: string) => void;
   completed?: boolean;
   lockUntil?: number;
 }
@@ -28,12 +31,39 @@ export default function LessonViewer({
   isLast,
   onComplete,
   onFail,
+  onTermClick,
   completed,
   lockUntil
 }: LessonViewerProps) {
   const [timeLeft, setTimeLeft] = useState(0);
   const [canStartQuiz, setCanStartQuiz] = useState(true);
   const [showQuiz, setShowQuiz] = useState(false);
+
+  // Processa o conteúdo para destacar siglas do dicionário
+  const processedContent = useMemo(() => {
+    let text = lesson.content;
+    
+    // Lista de termos para destacar (ordenados por tamanho para evitar substituições parciais)
+    const terms = [...DICTIONARY]
+      .sort((a, b) => b.term.length - a.term.length);
+
+    terms.forEach(entry => {
+      // Ignora termos muito curtos ou genéricos se necessário, 
+      // mas aqui vamos usar word boundaries para segurança
+      const escapedTerm = entry.term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      
+      // Regex que evita substituir termos que já estão dentro de links de markdown [text](link)
+      // ou que são partes de links. 
+      // Simplificado: substitui se houver borda de palavra e não for precedido por [ ou ( e não seguido por ] ou )
+      // Para o EnfeTech, a maioria das siglas é maiúscula e está isolada.
+      const regex = new RegExp(`(?<!\\[)\\b(${escapedTerm})\\b(?!\\])`, 'g');
+      
+      // Usamos um marcador temporário para evitar que uma substituição afete a outra
+      text = text.replace(regex, `[$1](dict://$1)`);
+    });
+
+    return text;
+  }, [lesson.content]);
 
   useEffect(() => {
     if (completed) {
@@ -118,6 +148,24 @@ export default function LessonViewer({
                     {children}
                   </code>
                 ),
+                a: ({ href, children }) => {
+                  if (href?.startsWith('dict://')) {
+                    const term = href.replace('dict://', '');
+                    return (
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          haptics.light();
+                          onTermClick?.(term);
+                        }}
+                        className="text-accent font-bold border-b border-dashed border-accent/40 hover:bg-accent/10 px-0.5 rounded transition-colors cursor-pointer"
+                      >
+                        {children}
+                      </button>
+                    );
+                  }
+                  return <a href={href} target="_blank" rel="noreferrer" className="text-accent underline">{children}</a>;
+                },
                 blockquote: ({ children }) => {
                   const content = String(children);
                   const isTip = content.includes('[!DICA]');
@@ -166,7 +214,7 @@ export default function LessonViewer({
                 }
               }}
             >
-              {lesson.content}
+              {processedContent}
             </Markdown>
           </div>
         </div>

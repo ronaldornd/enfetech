@@ -41,6 +41,7 @@ export interface Scenario {
   difficulty: 'Fácil' | 'Média' | 'Alta';
   steps: ScenarioStep[];
   requiredLessonId?: string;
+  useStability?: boolean;
 }
 
 export interface POPSection {
@@ -61,7 +62,6 @@ export interface POP {
   objective: string;
   materials: string[];
   steps: POPStep[];
-  precautions: string[];
   precautions: string[];
   requiredLevel?: number;
   requiredLessonId?: string;
@@ -111,10 +111,27 @@ export interface Badge {
   unlocked: boolean;
 }
 
+export interface DailyChallenge {
+  id: string;
+  templateId: string;
+  title: string;
+  description: string;
+  type: 'lesson' | 'scenario' | 'flashcard' | 'tool';
+  target: number;
+  current: number;
+  completed: boolean;
+  xpReward: number;
+  icon: string;
+}
+
 export interface UserProfile {
   name: string;
   xp: number;
   level: number;
   lostPatients: number;
   onboardingCompleted: boolean;
+  lastDailyReset?: string; // ISO Date
+  activeChallenges?: DailyChallenge[];
+  soundsEnabled?: boolean;
+  hapticsEnabled?: boolean;
 }

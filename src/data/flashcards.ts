@@ -416,15 +416,13 @@ export const FLASHCARDS: Flashcard[] = [
     answer: '1. Sign-in (Antes da anestesia); 2. Time-out (Antes da incisão); 3. Sign-out (Antes do paciente sair da sala).',
     tags: ['Cirúrgica', 'Segurança'],
     requiredLessonId: 'l_surgical'
-  }
-    answer: '35 a 45 mmHg. Acima disso indica acidose respiratória.',
-    requiredLessonId: 'l_gaso'
   },
   {
     id: 'f-gaso-1',
     moduleId: 'c1',
     question: 'Qual o valor de referência do HCO3 na gasometria?',
     answer: '22 a 26 mEq/L. Representa o componente metabólico (renal).',
+    tags: ['Críticos', 'Gasometria'],
     requiredLessonId: 'l_gaso'
   },
   {
@@ -432,6 +430,7 @@ export const FLASHCARDS: Flashcard[] = [
     moduleId: 'c1',
     question: 'O que significa a sigla MONA no atendimento ao IAM?',
     answer: 'Morfina, Oxigênio, Nitrato e AAS (Antiagregante).',
+    tags: ['Críticos', 'Cardiologia'],
     requiredLessonId: 'l_iam'
   },
   {
@@ -439,6 +438,7 @@ export const FLASHCARDS: Flashcard[] = [
     moduleId: 'c1',
     question: 'Qual o tempo máximo recomendado para realizar o ECG na dor torácica?',
     answer: 'Até 10 minutos após a entrada no serviço de emergência.',
+    tags: ['Críticos', 'Cardiologia'],
     requiredLessonId: 'l_iam'
   },
   {
@@ -446,6 +446,7 @@ export const FLASHCARDS: Flashcard[] = [
     moduleId: 'w1',
     question: 'Quais são os "4 Ts" da Hemorragia Pós-parto?',
     answer: 'Tônus, Trauma, Tecido e Trombina.',
+    tags: ['Obstetrícia', 'HPP'],
     requiredLessonId: 'l_hem_pos'
   },
   {
@@ -453,9 +454,7 @@ export const FLASHCARDS: Flashcard[] = [
     moduleId: 'w1',
     question: 'Qual a causa mais comum de HPP?',
     answer: 'Atonia Uterina (Problema no Tônus). Corresponde a 70% dos casos.',
-    requiredLessonId: 'l_hem_pos'
-  }
-    answer: 'Atonia Uterina (Problema no Tônus). Corresponde a 70% dos casos.',
+    tags: ['Obstetrícia', 'HPP'],
     requiredLessonId: 'l_hem_pos'
   },
   {
@@ -463,6 +462,7 @@ export const FLASHCARDS: Flashcard[] = [
     moduleId: 'k1',
     question: 'Qual a diferença entre VIP e VOP?',
     answer: 'VIP é a vacina Inativada (Injetável) e VOP é a vacina Oral (Atenuada).',
+    tags: ['Pediatria', 'Vacinas'],
     requiredLessonId: 'l_vacinas'
   },
   {
@@ -470,6 +470,7 @@ export const FLASHCARDS: Flashcard[] = [
     moduleId: 'k1',
     question: 'Onde deve ser aplicada a vacina BCG?',
     answer: 'No braço direito, por via intradérmica.',
+    tags: ['Pediatria', 'Vacinas'],
     requiredLessonId: 'l_vacinas'
   },
   {
@@ -477,6 +478,7 @@ export const FLASHCARDS: Flashcard[] = [
     moduleId: 'k1',
     question: 'Quais os dias recomendados para o Teste do Pezinho?',
     answer: 'Entre o 3º e o 5º dia de vida.',
+    tags: ['Pediatria', 'Triagem'],
     requiredLessonId: 'l_pezinho'
   },
   {
@@ -484,6 +486,7 @@ export const FLASHCARDS: Flashcard[] = [
     moduleId: 'p1',
     question: 'Qual a fórmula para cálculo de gotas por minuto (em horas)?',
     answer: 'Volume / (Tempo x 3).',
+    tags: ['Farmacologia', 'Cálculos'],
     requiredLessonId: 'l_calc'
   },
   {
@@ -491,6 +494,7 @@ export const FLASHCARDS: Flashcard[] = [
     moduleId: 'p1',
     question: '1 ml equivale a quantas microgotas?',
     answer: '60 microgotas.',
+    tags: ['Farmacologia', 'Cálculos'],
     requiredLessonId: 'l_calc'
   },
   {
@@ -498,6 +502,47 @@ export const FLASHCARDS: Flashcard[] = [
     moduleId: 'p1',
     question: 'Qual insulina tem aspecto leitoso?',
     answer: 'NPH (Ação intermediária).',
+    tags: ['Farmacologia', 'Insulinas'],
     requiredLessonId: 'l_insu'
+  },
+  {
+    id: 'f-uti-1',
+    moduleId: 'c1',
+    question: 'Qual o valor alvo de PAM (Pressão Arterial Média) para perfusão adequada?',
+    answer: 'PAM >= 65 mmHg.',
+    tags: ['UTI', 'PAM', 'Críticos'],
+    requiredLessonId: 'l_uti_pam'
+  },
+  {
+    id: 'f-uti-2',
+    moduleId: 'c1',
+    question: 'Onde deve ser o ponto zero (eixo flebostático) para nivelar a PAM?',
+    answer: 'No 4º Espaço Intercostal, na Linha Axilar Média.',
+    tags: ['UTI', 'Procedimentos'],
+    requiredLessonId: 'l_uti_pam'
+  },
+  {
+    id: 'f-ped-4',
+    moduleId: 'k1',
+    question: 'Com quantos meses o bebê deve sustentar o pescoço e apresentar o sorriso social?',
+    answer: 'Aos 2 meses.',
+    tags: ['Pediatria', 'Marcos'],
+    requiredLessonId: 'l_ped_marks'
+  },
+  {
+    id: 'f-calc-3',
+    moduleId: 'p1',
+    question: 'Qual a fórmula para cálculo de gotas em tempo em horas?',
+    answer: 'Volume / (Tempo x 3).',
+    tags: ['Cálculos', 'Gotejamento'],
+    requiredLessonId: 'l_calc_drop'
+  },
+  {
+    id: 'f-calc-4',
+    moduleId: 'p1',
+    question: 'Quantas gotas correspondem a 1 ml?',
+    answer: '20 gotas (ou 60 microgotas).',
+    tags: ['Cálculos', 'Revisão'],
+    requiredLessonId: 'l_calc_drop'
   }
 ];

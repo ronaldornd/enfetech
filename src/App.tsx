@@ -23,7 +23,15 @@ import {
   Stethoscope,
   Timer,
   Activity,
-  Heart
+  Heart,
+  Download,
+  Upload,
+  Volume2,
+  VolumeX,
+  Smartphone,
+  Beaker,
+  HeartPulse,
+  Droplet
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -38,9 +46,14 @@ import {
 } from './data/index';
 import { storage } from './utils/storage';
 import { haptics } from './utils/haptics';
+import ManchesterSim from './components/ManchesterSim';
+import ABGSim from './components/ABGSim';
+import ECGSim from './components/ECGSim';
+import PumpSim from './components/PumpSim';
 import { Module, Scenario, Flashcard as FlashcardType, Lesson } from './types';
 import DripRateCalculator from './components/DripRateCalculator';
 import FlashcardDeck from './components/FlashcardDeck';
+import { generateDailyChallenges } from './data/challenges';
 import POPViewer from './components/POPViewer';
 import DictionaryExplorer from './components/DictionaryExplorer';
 import PillViewer from './components/PillViewer';
@@ -49,6 +62,26 @@ import LessonViewer from './components/LessonViewer';
 import Onboarding from './components/Onboarding';
 import { UserProfile } from './types';
 import { SuccessOverlay } from './components/SuccessOverlay';
+import { SRSData } from './utils/srs';
+
+// Sound Configuration
+const SOUNDS = {
+  CORRECT: '/assets/sounds/correct.mp3',
+  WRONG: '/assets/sounds/wrong.mp3',
+  ACHIEVEMENT: '/assets/sounds/achievement.mp3',
+  GAMEOVER: '/assets/sounds/gameover.mp3',
+  CLICK: '/assets/sounds/click.mp3'
+};
+
+// Audio Pool for instant playback (Pre-loading)
+const AUDIO_POOL: Record<string, HTMLAudioElement> = {};
+if (typeof window !== 'undefined') {
+  Object.entries(SOUNDS).forEach(([key, path]) => {
+    const audio = new Audio(path);
+    audio.preload = 'auto';
+    AUDIO_POOL[key] = audio;
+  });
+}
 
 // Components
 const StatCard = ({ label, value, icon: Icon, colorClass }: any) => (
@@ -82,7 +115,7 @@ const ModuleCard = ({ module, onClick }: { module: Module; onClick: () => void; 
       whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => {
-        haptics.light();
+        triggerHaptic('light');
         onClick();
       }}
       className="w-full bg-surface p-5 rounded-[32px] border border-border flex items-center gap-5 text-left transition-all hover:bg-surface-hover hover:shadow-xl hover:shadow-accent/5 group relative overflow-hidden"
@@ -101,8 +134,6 @@ const ModuleCard = ({ module, onClick }: { module: Module; onClick: () => void; 
       </div>
     </motion.button>
   );
-};
-  return dateStr;
 };
 
 const getCareerTitle = (level: number) => {
@@ -149,6 +180,8 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
     </div>
   );
 };
+
+export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'learn' | 'sim' | 'tools' | 'profile'>('home');
   const [showCalculator, setShowCalculator] = useState(false);
   const [showFlashcards, setShowFlashcards] = useState<{ show: boolean, moduleId?: string }>({ show: false });
@@ -156,7 +189,11 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
   const [showPills, setShowPills] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
-  const [showDictionary, setShowDictionary] = useState<{ show: boolean, tab: 'sigla' | 'escala' }>({ show: false, tab: 'sigla' });
+  const [showDictionary, setShowDictionary] = useState<{ show: boolean, tab: 'sigla' | 'escala', term?: string }>({ show: false, tab: 'sigla' });
+  const [showManchesterSim, setShowManchesterSim] = useState(false);
+  const [showABGSim, setShowABGSim] = useState(false);
+  const [showECGSim, setShowECGSim] = useState(false);
+  const [showPumpSim, setShowPumpSim] = useState(false);
   const [successState, setSuccessState] = useState<{ show: boolean, type: 'level' | 'badge' | 'lesson', title: string, subtitle: string }>({
     show: false,
     type: 'lesson',
@@ -165,15 +202,88 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
   });
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [selectedModuleForLessons, setSelectedModuleForLessons] = useState<Module | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [xp, setXp] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [lostPatients, setLostPatients] = useState(0);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [completedScenarios, setCompletedScenarios] = useState<string[]>([]);
   const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
   const [lessonLocks, setLessonLocks] = useState<Record<string, number>>({});
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [srsProgress, setSrsProgress] = useState<Record<string, SRSData>>({});
+  const [isChallengesExpanded, setIsChallengesExpanded] = useState(false);
+
+  const triggerHaptic = (type: 'light' | 'medium' | 'success' | 'error') => {
+    if (profile?.hapticsEnabled !== false) {
+      haptics[type]();
+    }
+  };
+
+  const playSound = (type: keyof typeof SOUNDS) => {
+    if (profile?.soundsEnabled === true) {
+      const audio = AUDIO_POOL[type];
+      if (audio) {
+        audio.currentTime = 0; // Reset to start for instant replay
+        audio.volume = 0.5;
+        audio.play().catch(() => {}); // Catch prevents drama on first interaction
+      }
+    }
+  };
+
+  // Daily Challenge Generation Logic
+  useEffect(() => {
+    if (!isInitialized || !profile) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    if (profile.lastDailyReset !== today) {
+      const newChallenges = generateDailyChallenges(today);
+      setProfile(prev => prev ? ({
+        ...prev,
+        lastDailyReset: today,
+        activeChallenges: newChallenges
+      }) : null);
+    }
+  }, [profile?.lastDailyReset, isInitialized]);
+
+  const updateChallengeProgress = (type: string, amount: number = 1, metadata?: any) => {
+    if (!profile || !profile.activeChallenges) return;
+
+    let xpBonus = 0;
+    const updatedChallenges = profile.activeChallenges.map(challenge => {
+      if (challenge.completed) return challenge;
+      
+      let increment = 0;
+      if (challenge.type === type) {
+        // Special filters
+        if (challenge.templateId === 'ct_lessons_ped' && metadata?.moduleId !== 'pediatrics') return challenge;
+        if (challenge.templateId === 'ct_lessons_far' && metadata?.moduleId !== 'pharmacology') return challenge;
+        if (challenge.templateId === 'ct_scenarios_hard' && metadata?.difficulty !== 'Alta') return challenge;
+        if (challenge.templateId === 'ct_flashcards_tags' && !metadata?.tags?.includes('Críticos')) return challenge;
+
+        increment = amount;
+      }
+
+      const newCurrent = Math.min(challenge.target, challenge.current + increment);
+      const justCompleted = !challenge.completed && newCurrent >= challenge.target;
+      
+      if (justCompleted) {
+        xpBonus += challenge.xpReward;
+        triggerHaptic('success');
+      }
+
+      return {
+        ...challenge,
+        current: newCurrent,
+        completed: justCompleted || challenge.completed
+      };
+    });
+
+    if (xpBonus > 0 || updatedChallenges !== profile.activeChallenges) {
+      setProfile(prev => prev ? ({
+        ...prev,
+        xp: prev.xp + xpBonus,
+        activeChallenges: updatedChallenges
+      }) : null);
+    }
+  };
 
   const [showAchievement, setShowAchievement] = useState<{ show: boolean, title: string, subtitle: string, icon: any } | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -190,63 +300,150 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
     if (timerActive) {
       interval = setInterval(() => {
         setSimulationTime(prev => prev + 1);
+        // Passive stability decay: 2% per second if useStability is true
+        setStability(prev => Math.max(0, prev - 2));
       }, 1000);
     } else {
-      setSimulationTime(0);
       clearInterval(interval);
     }
     return () => clearInterval(interval);
   }, [timerActive]);
 
-  // Load state from storage
+  // Failure by exhaustion
   useEffect(() => {
-    async function loadData() {
-      // Migrate legacy localStorage data if any
-      await storage.migrate();
-      
-      const savedProfile = await storage.get<UserProfile>('enfetech_profile');
-      if (savedProfile) {
-        setProfile(savedProfile);
-        setXp(savedProfile.xp);
-        setLevel(savedProfile.level);
-        setLostPatients(savedProfile.lostPatients || 0);
-      }
-      
-      const savedLessons = await storage.get<string[]>('enfetech_lessons') || [];
-      setCompletedLessons(savedLessons);
-
-      const savedScenarios = await storage.get<string[]>('enfetech_scenarios') || [];
-      setCompletedScenarios(savedScenarios);
-      
-      const savedBadges = await storage.get<string[]>('enfetech_badges') || [];
-      setUnlockedBadges(savedBadges);
-      
-      const savedLocks = await storage.get<Record<string, number>>('enfetech_lesson_locks') || {};
-      setLessonLocks(savedLocks);
-      
-      setIsInitialized(true);
+    if (timerActive && stability <= 0) {
+      setTimerActive(false);
+      playSound('GAMEOVER');
+      // SimulatorsView handles the result display if stability is 0
     }
-    loadData();
+  }, [stability, timerActive]);
+
+  // Sincronização e Carregamento
+  useEffect(() => {
+    async function init() {
+      try {
+        await storage.migrate();
+        const savedProfile = await storage.get('user_profile') as UserProfile | null;
+        const savedLessons = await storage.get('enfetech_lessons') as string[] | null;
+        const savedScenarios = await storage.get('enfetech_scenarios') as string[] | null;
+        const savedBadges = await storage.get('enfetech_badges') as string[] | null;
+        const savedLocks = await storage.get('enfetech_lesson_locks') as Record<string, number> | null;
+        const savedSrs = await storage.get('enfetech_srs') as Record<string, SRSData> | null;
+
+        if (savedProfile) setProfile(savedProfile);
+        if (savedLessons) setCompletedLessons(savedLessons);
+        if (savedScenarios) setCompletedScenarios(savedScenarios);
+        if (savedBadges) setUnlockedBadges(savedBadges);
+        if (savedLocks) setLessonLocks(savedLocks);
+        if (savedSrs) setSrsProgress(savedSrs);
+      } catch (err) {
+        console.error('Erro ao inicializar:', err);
+      } finally {
+        setIsInitialized(true);
+      }
+    }
+    init();
   }, []);
 
-  // Sync state to storage
   useEffect(() => {
-    if (profile) {
-      storage.set('enfetech_profile', { ...profile, xp, level, lostPatients });
+    if (isInitialized && profile) {
+      storage.set('user_profile', profile);
     }
-  }, [profile, xp, level, lostPatients]);
+  }, [profile, isInitialized]);
 
   useEffect(() => {
     if (isInitialized) {
       storage.set('enfetech_lessons', completedLessons);
-    }
-  }, [completedLessons, isInitialized]);
-
-  useEffect(() => {
-    if (isInitialized) {
+      storage.set('enfetech_scenarios', completedScenarios);
       storage.set('enfetech_badges', unlockedBadges);
+      storage.set('enfetech_lesson_locks', lessonLocks);
+      storage.set('enfetech_srs', srsProgress);
     }
-  }, [unlockedBadges, isInitialized]);
+  }, [completedLessons, completedScenarios, unlockedBadges, lessonLocks, srsProgress, isInitialized]);
+
+  const exportAppData = () => {
+    const backup = {
+      version: '1.1',
+      timestamp: new Date().toISOString(),
+      data: {
+        profile,
+        lessons: completedLessons,
+        scenarios: completedScenarios,
+        badges: unlockedBadges,
+        locks: lessonLocks,
+        srs: srsProgress
+      }
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `enfetech-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    setShowNotification({
+      show: true,
+      title: 'Segurança Pronta!',
+      subtitle: 'Backup baixado com sucesso no seu dispositivo.',
+      type: 'success'
+    });
+  };
+
+  const handleImportAppData = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const text = e.target?.result as string;
+        const backup = JSON.parse(text);
+        
+        if (!backup.data || !backup.data.profile) {
+          throw new Error('Formato inválido');
+        }
+
+        const data = backup.data;
+        
+        // Update States
+        setProfile(data.profile);
+        setCompletedLessons(data.lessons || []);
+        setCompletedScenarios(data.scenarios || []);
+        setUnlockedBadges(data.badges || []);
+        setLessonLocks(data.locks || {});
+        setSrsProgress(data.srs || {});
+        
+        // Persist immediately
+        await storage.set('enfetech_profile', data.profile);
+        await storage.set('enfetech_lessons', data.lessons || []);
+        await storage.set('enfetech_scenarios', data.scenarios || []);
+        await storage.set('enfetech_badges', data.badges || []);
+        await storage.set('enfetech_lesson_locks', data.locks || {});
+        await storage.set('enfetech_srs', data.srs || {});
+
+        setShowNotification({
+          show: true,
+          title: 'Dados Restaurados!',
+          subtitle: 'Seu progresso foi recuperado com sucesso.',
+          type: 'success'
+        });
+        
+        // Trigger haptics
+        triggerHaptic('success');
+      } catch (err) {
+        setShowNotification({
+          show: true,
+          title: 'Erro no Backup',
+          subtitle: 'Este arquivo não é um backup válido do EnfeTech.',
+          type: 'error'
+        });
+      }
+    };
+    reader.readAsText(file);
+    // Clear input
+    event.target.value = '';
+  };
 
   useEffect(() => {
     if (isInitialized) {
@@ -272,29 +469,35 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
   }, [completedLessons]);
 
   const addXp = (amount: number) => {
-    setXp(prev => {
-      const newXp = prev + amount;
-      if (newXp >= level * 1000) {
-        setLevel(l => l + 1);
-        handleBadgeUnlock('b4'); // Level up badge
-        haptics.success();
+    setProfile(prev => {
+      if (!prev) return null;
+      const newXp = prev.xp + amount;
+      const nextLevelXp = prev.level * 1000;
+      
+      if (newXp >= nextLevelXp) {
+        setShowLevelUp(true);
+        playSound('ACHIEVEMENT');
+        triggerHaptic('success');
+        setTimeout(() => setShowLevelUp(false), 5000);
         setSuccessState({
             show: true,
             type: 'level',
             title: 'Subiu de Nível!',
-            subtitle: `Você agora é nível ${level + 1}`
+            subtitle: `Você agora é nível ${prev.level + 1}`
         });
+        return { ...prev, xp: newXp - nextLevelXp, level: prev.level + 1 };
       } else {
-        haptics.light();
+        triggerHaptic('light');
+        return { ...prev, xp: newXp };
       }
-      return newXp;
     });
   };
 
   const removeXp = (amount: number, reason: string) => {
-    setXp(prev => {
-      const newXp = Math.max(0, prev - amount);
-      haptics.error();
+    setProfile(prev => {
+      if (!prev) return null;
+      const newXp = Math.max(0, prev.xp - amount);
+      triggerHaptic('error');
       setShowNotification({
         show: true,
         title: 'Penalidade Ética',
@@ -302,19 +505,19 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
         type: 'error'
       });
       setTimeout(() => setShowNotification(null), 4000);
-      return newXp;
+      return { ...prev, xp: newXp };
     });
   };
 
   const reportDeath = () => {
-    setLostPatients(prev => prev + 1);
+    setProfile(prev => prev ? ({ ...prev, lostPatients: prev.lostPatients + 1 }) : null);
     removeXp(200, 'Evento Adverso Grave (Óbito)');
   };
 
   const handleBadgeUnlock = (badgeId: string) => {
     if (!unlockedBadges.includes(badgeId)) {
       setUnlockedBadges(prev => [...prev, badgeId]);
-      haptics.medium();
+      triggerHaptic('medium');
       const badge = BADGES.find(b => b.id === badgeId);
       if (badge) {
         setShowAchievement({
@@ -332,7 +535,11 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
     if (!completedLessons.includes(lessonId)) {
       setCompletedLessons(prev => [...prev, lessonId]);
       
-      // Limpa a trava caso exista ao completar
+      const lesson = LESSONS.find(l => l.id === lessonId);
+      if (lesson) {
+        updateChallengeProgress('lesson', 1, { moduleId: lesson.moduleId });
+      }
+
       if (lessonLocks[lessonId]) {
         const newLocks = { ...lessonLocks };
         delete newLocks[lessonId];
@@ -341,7 +548,6 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
 
       addXp(100);
       
-      // Check for lesson master badge
       const totalDone = completedLessons.length + 1;
       if (totalDone >= 5 && !unlockedBadges.includes('b5')) {
         handleBadgeUnlock('b5');
@@ -358,7 +564,7 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
   };
 
   const resetAllData = () => {
-    try { haptics.medium(); } catch(e) {}
+    try { triggerHaptic('medium'); } catch(e) {}
     setShowResetConfirm(true);
   };
 
@@ -371,9 +577,7 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
       setCompletedScenarios([]);
       setUnlockedBadges([]);
       setLessonLocks({});
-      setXp(0);
-      setLevel(1);
-      setLostPatients(0);
+      setSrsProgress({});
       setShowResetConfirm(false);
       
       setTimeout(() => {
@@ -386,14 +590,16 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
   };
 
   const handleOnboardingComplete = (newProfile: UserProfile) => {
-    setProfile(newProfile);
-    setXp(newProfile.xp);
-    setLevel(newProfile.level);
+    setProfile({
+      ...newProfile,
+      hapticsEnabled: true, // Haptics default to ON
+      soundsEnabled: false  // Sounds default to OFF
+    });
   };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as any);
-    haptics.light();
+    triggerHaptic('light');
   };
 
   const handleSearchResult = (type: string, id: string, extra?: any) => {
@@ -412,7 +618,8 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
         setActiveTab('sim');
         break;
       case 'dictionary':
-        setShowDictionary({ show: true, tab: extra === 'escala' ? 'escala' : 'sigla' });
+        setShowDictionary({ show: true, tab: extra === 'escala' ? 'escala' : 'sigla', term: id });
+        updateChallengeProgress('dictionary', 1);
         break;
       case 'pop':
         setShowPOPs(true);
@@ -422,6 +629,23 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
         break;
     }
   };
+
+  if (!isInitialized) {
+    return (
+      <div className="fixed inset-0 z-[200] bg-bg flex flex-col items-center justify-center gap-4">
+        <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+        <p className="text-text-secondary font-bold text-xs uppercase tracking-widest animate-pulse">Sincronizando Dados...</p>
+      </div>
+    );
+  }
+
+  if (!profile || !profile.onboardingCompleted) {
+    return (
+      <AnimatePresence>
+        <Onboarding onComplete={handleOnboardingComplete} />
+      </AnimatePresence>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#050505] pb-24 max-w-md mx-auto relative overflow-x-hidden border-x border-border shadow-2xl bg-bg">
@@ -455,17 +679,12 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="absolute inset-0 bg-dot-pattern opacity-[0.03] pointer-events-none" />
       
-      <AnimatePresence>
-        {!profile && isInitialized && (
-          <Onboarding onComplete={handleOnboardingComplete} />
-        )}
-      </AnimatePresence>
+      <div className="absolute inset-0 bg-dot-pattern opacity-[0.03] pointer-events-none" />
       
       {/* Level Up Notification */}
       <AnimatePresence>
-        {showLevelUp && (
+        {showLevelUp && profile && (
           <motion.div 
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 10 }}
@@ -475,7 +694,7 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
             <Award className="w-6 h-6 fill-white" />
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em]">Parabéns!</p>
-              <p className="text-sm font-bold">Você subiu para o Nível {level}!</p>
+              <p className="text-sm font-bold">Você subiu para o Nível {profile.level}!</p>
             </div>
           </motion.div>
         )}
@@ -498,10 +717,10 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
             </button>
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 bg-gradient-to-r from-accent to-[#8E44AD] text-white px-3 py-1.5 rounded-2xl shadow-lg ring-1 ring-white/20">
-                <Award className="w-4 h-4 text-white" />
-                <span className="text-sm font-bold">Nível {level}</span>
+                < Award className="w-4 h-4 text-white" />
+                <span className="text-sm font-bold">Nível {profile?.level || 1}</span>
               </div>
-              <span className="text-[9px] font-black uppercase text-accent mt-1 tracking-tighter opacity-80">{getCareerTitle(level)}</span>
+              <span className="text-[9px] font-black uppercase text-accent mt-1 tracking-tighter opacity-80">{getCareerTitle(profile?.level || 1)}</span>
             </div>
           </div>
         </div>
@@ -510,12 +729,12 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
         <div className="mb-4">
           <div className="flex justify-between text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-1.5">
             <span>Experiência (XP)</span>
-            <span>{xp} / {level * 1000}</span>
+            <span>{profile?.xp || 0} / {(profile?.level || 1) * 1000}</span>
           </div>
           <div className="h-2 bg-border rounded-full overflow-hidden">
             <motion.div 
               initial={{ width: 0 }}
-              animate={{ width: `${(xp / (level * 1000)) * 100}%` }}
+              animate={{ width: `${(profile?.xp / (profile?.level * 1000) || 0) * 100}%` }}
               className="h-full bg-accent rounded-full"
             />
           </div>
@@ -533,27 +752,66 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
               exit={{ opacity: 0, y: -10 }}
               className="space-y-6"
             >
-              {/* Daily Goals Card */}
+              {/* Daily Goals Card (Accordion) */}
               <motion.div 
-                whileHover={{ y: -5 }}
-                className="bg-gradient-to-br from-[#2D3436] to-[#000000] p-6 rounded-[40px] border border-white/10 relative overflow-hidden shadow-2xl group"
+                layout
+                onClick={() => setIsChallengesExpanded(!isChallengesExpanded)}
+                className="bg-gradient-to-br from-[#2D3436] to-[#000000] p-6 rounded-[40px] border border-white/10 relative overflow-hidden shadow-2xl group cursor-pointer"
               >
                 <div className="absolute top-0 right-0 w-40 h-40 bg-accent/20 blur-[100px] -mr-20 -mt-20 group-hover:bg-accent/40 transition-colors" />
                 <div className="relative z-10 flex justify-between items-center">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">Desafio Diário</p>
-                    <h3 className="text-2xl font-black text-white italic">Domine a Farmaco!</h3>
-                    <p className="text-white/60 text-xs font-medium">Complete 2 lições de Cálculo e ganhe 500 XP bônus.</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">Desafios de Hoje</p>
+                    <h3 className="text-2xl font-black text-white italic">Progresso Diário</h3>
                   </div>
-                  <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl">
-                    <Zap className="w-7 h-7 text-accent fill-accent" />
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl">
+                      <Zap className={`w-6 h-6 text-accent fill-accent transition-transform duration-500 ${isChallengesExpanded ? 'rotate-180' : ''}`} />
+                    </div>
                   </div>
                 </div>
-                <div className="mt-6 flex gap-2">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className={`h-1.5 flex-1 rounded-full ${i === 1 ? 'bg-accent shadow-[0_0_10px_#6C5CE7]' : 'bg-white/10'}`} />
-                  ))}
-                </div>
+                
+                <AnimatePresence>
+                  {isChallengesExpanded && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                      animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
+                      exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                      className="space-y-4 relative z-10 overflow-hidden"
+                    >
+                      {profile?.activeChallenges?.map((challenge, idx) => (
+                        <div key={challenge.id} className="space-y-1.5">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] font-bold text-white/80">{challenge.title}</span>
+                            <span className="text-[10px] font-black text-accent">{challenge.current}/{challenge.target}</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(challenge.current / challenge.target || 0) * 100}%` }}
+                              className={`h-full ${challenge.completed ? 'bg-success shadow-[0_0_10px_#2ecc71]' : 'bg-accent shadow-[0_0_10px_#6C5CE7]'}`}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {!isChallengesExpanded && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="mt-4 flex gap-2 items-center"
+                  >
+                    <p className="text-white/60 text-[10px] font-bold uppercase tracking-wider">Toque para ver missões</p>
+                    <div className="flex gap-1">
+                      {profile?.activeChallenges?.map(c => (
+                        <div key={c.id} className={`w-1.5 h-1.5 rounded-full ${c.completed ? 'bg-success' : 'bg-white/20'}`} />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
               </motion.div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -610,9 +868,17 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
 
           {activeTab === 'sim' && <SimulatorsView 
             completedScenarios={completedScenarios}
+            completedLessons={completedLessons}
+            stability={stability}
+            setStability={setStability}
+            simulationTime={simulationTime}
+            setSimulationTime={setSimulationTime}
+            timerActive={timerActive}
+            setTimerActive={setTimerActive}
             onScenarioComplete={(scenario) => {
               if (!completedScenarios.includes(scenario.id)) {
                 setCompletedScenarios(prev => [...prev, scenario.id]);
+                updateChallengeProgress('scenario', 1, { difficulty: scenario.difficulty });
                 addXp(scenario.xpReward);
                 setSuccessState({
                   show: true,
@@ -623,6 +889,13 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
               }
             }} 
             onFail={reportDeath} 
+            playSound={playSound}
+            setShowNotification={setShowNotification}
+            triggerHaptic={triggerHaptic}
+            onManchesterStart={() => setShowManchesterSim(true)}
+            onABGStart={() => setShowABGSim(true)}
+            onECGStart={() => setShowECGSim(true)}
+            onPumpStart={() => setShowPumpSim(true)}
           />}
           {activeTab === 'learn' && (
             <LearnView 
@@ -642,22 +915,37 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
             <ToolsView 
               onOpenCalculator={() => {
                 setShowCalculator(true);
+                updateChallengeProgress('tool', 1);
                 addXp(10);
               }} 
-              onOpenPOPs={() => setShowPOPs(true)}
+              onOpenPOPs={() => {
+                setShowPOPs(true);
+                updateChallengeProgress('tool', 1);
+              }}
               onOpenDictionary={(tab) => {
                 setShowDictionary({ show: true, tab });
+                updateChallengeProgress('dictionary', 1);
                 addXp(5);
               }}
             />
           )}
-          {activeTab === 'profile' && (
+          {activeTab === 'profile' && profile && (
             <ProfileView 
-              xp={xp} 
-              level={level} 
-              name={profile?.name || 'Usuário'} 
-              lostPatients={lostPatients}
+              xp={profile?.xp || 0} 
+              level={profile?.level || 1} 
+              name={profile?.name || ''} 
+              lostPatients={profile?.lostPatients || 0}
               onReset={() => setShowResetConfirm(true)} 
+              onExport={exportAppData}
+              onImport={handleImportAppData}
+              onToggleSounds={() => {
+                setProfile(prev => prev ? ({ ...prev, soundsEnabled: !prev.soundsEnabled }) : null);
+              }}
+              soundsEnabled={!!profile?.soundsEnabled}
+              onToggleHaptics={() => {
+                setProfile(prev => prev ? ({ ...prev, hapticsEnabled: !prev.hapticsEnabled }) : null);
+              }}
+              hapticsEnabled={profile?.hapticsEnabled !== false}
               completedLessons={completedLessons}
               unlockedBadges={unlockedBadges}
             />
@@ -709,13 +997,16 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
               setShowFlashcards({ show: false });
               addXp(50);
             }} 
+            onCorrect={(card) => updateChallengeProgress('flashcard', 1, card)}
             completedLessons={completedLessons}
+            srsProgress={srsProgress}
+            onUpdateSRS={(cardId, newData) => setSrsProgress(prev => ({ ...prev, [cardId]: newData }))}
           />
         )}
         {showPOPs && (
           <POPViewer 
             onClose={() => setShowPOPs(false)} 
-            userLevel={level} 
+            userLevel={profile?.level || 1} 
             completedLessons={completedLessons}
           />
         )}
@@ -727,10 +1018,86 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
         )}
         {showDictionary.show && (
           <DictionaryExplorer 
-            onClose={() => setShowDictionary({ ...showDictionary, show: false })} 
+            onClose={() => setShowDictionary({ show: false, tab: 'sigla' })} 
             initialTab={showDictionary.tab}
-            userLevel={level}
+            initialTerm={showDictionary.term}
+            userLevel={profile?.level || 1}
             completedLessons={completedLessons}
+          />
+        )}
+
+        {showManchesterSim && (
+          <ManchesterSim 
+            onClose={() => setShowManchesterSim(false)}
+            playSound={playSound}
+            triggerHaptic={triggerHaptic}
+            onComplete={(xpReward) => {
+              addXp(xpReward);
+              setShowManchesterSim(false);
+              setSuccessState({
+                show: true,
+                type: 'lesson',
+                title: 'Desafio Manchester',
+                subtitle: `Você ganhou ${xpReward} XP com sucesso!`
+              });
+            }}
+          />
+        )}
+        {showABGSim && (
+          <ABGSim 
+            onClose={() => setShowABGSim(false)}
+            playSound={playSound}
+            triggerHaptic={triggerHaptic}
+            onComplete={(xpReward) => {
+              addXp(xpReward);
+              setShowABGSim(false);
+              if (xpReward > 0) {
+                setSuccessState({
+                  show: true,
+                  type: 'lesson',
+                  title: 'Laboratório Concluído',
+                  subtitle: `Você ganhou ${xpReward} XP laudando gasometrias!`
+                });
+              }
+            }}
+          />
+        )}
+        {showECGSim && (
+          <ECGSim 
+            onClose={() => setShowECGSim(false)}
+            playSound={playSound}
+            triggerHaptic={triggerHaptic}
+            onComplete={(xpReward) => {
+              addXp(xpReward);
+              setShowECGSim(false);
+              if (xpReward > 0) {
+                setSuccessState({
+                  show: true,
+                  type: 'lesson',
+                  title: 'Treino de Arritmias',
+                  subtitle: `Você ganhou ${xpReward} XP salvando vidas!`
+                });
+              }
+            }}
+          />
+        )}
+        {showPumpSim && (
+          <PumpSim 
+            onClose={() => setShowPumpSim(false)}
+            playSound={playSound}
+            triggerHaptic={triggerHaptic}
+            onComplete={(xpReward) => {
+              addXp(xpReward);
+              setShowPumpSim(false);
+              if (xpReward > 0) {
+                setSuccessState({
+                  show: true,
+                  type: 'lesson',
+                  title: 'Farmacologia Prática',
+                  subtitle: `Você obteve ${xpReward} XP calculando infusões!`
+                });
+              }
+            }}
           />
         )}
         {showSearch && (
@@ -745,6 +1112,7 @@ const CircularProgress = ({ progress, size = 52, strokeWidth = 5, color = '#6C5C
             onClose={() => setActiveLesson(null)}
             onComplete={() => markLessonComplete(activeLesson.id)}
             onFail={() => markLessonFailed(activeLesson.id)}
+            onTermClick={(term) => setShowDictionary({ show: true, tab: 'sigla', term })}
             completed={completedLessons.includes(activeLesson.id)}
             lockUntil={lessonLocks[activeLesson.id]}
             isFirst={LESSONS.filter(l => l.moduleId === activeLesson.moduleId).indexOf(activeLesson) === 0}
@@ -991,16 +1359,68 @@ function LearnView({
   );
 }
 
-function SimulatorsView({ completedScenarios, onScenarioComplete, onFail }: { completedScenarios: string[], onScenarioComplete: (s: Scenario) => void, onFail: () => void }) {
+function SimulatorsView({ 
+  completedScenarios, 
+  completedLessons, 
+  stability, 
+  setStability, 
+  simulationTime, 
+  setSimulationTime, 
+  timerActive, 
+  setTimerActive, 
+  onScenarioComplete, 
+  onFail,
+  playSound,
+  setShowNotification,
+  triggerHaptic,
+  onManchesterStart,
+  onABGStart,
+  onECGStart,
+  onPumpStart
+}: { 
+  completedScenarios: string[], 
+  completedLessons: string[], 
+  stability: number, 
+  setStability: (s: number) => void, 
+  simulationTime: number, 
+  setSimulationTime: (t: number) => void, 
+  timerActive: boolean, 
+  setTimerActive: (a: boolean) => void, 
+  onScenarioComplete: (s: Scenario) => void, 
+  onFail: () => void,
+  playSound: (type: keyof typeof SOUNDS) => void,
+  setShowNotification: (notif: any) => void,
+  triggerHaptic: (type: any) => void,
+  onManchesterStart: () => void,
+  onABGStart: () => void,
+  onECGStart: () => void,
+  onPumpStart: () => void
+}) {
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
   const [currentStepId, setCurrentStepId] = useState<string | null>(null);
   const [result, setResult] = useState<{ feedback: string; isCorrect: boolean } | null>(null);
+
+  const currentStep = activeScenario?.steps.find(s => s.id === currentStepId);
 
   const startScenario = (scenario: Scenario) => {
     setActiveScenario(scenario);
     setCurrentStepId(scenario.steps[0].id);
     setResult(null);
+    setStability(100);
+    setSimulationTime(0);
+    setTimerActive(true);
   };
+
+  // Handle passive failure (stability reaches 0 via decay)
+  useEffect(() => {
+    if (activeScenario?.useStability && stability <= 0 && !result) {
+      setResult({ 
+        feedback: "O paciente entrou em colapso devido à demora ou sucessão de erros.", 
+        isCorrect: false 
+      });
+      playSound('GAMEOVER');
+    }
+  }, [stability, activeScenario, result]);
 
   const filteredScenarios = SCENARIOS.filter(s => {
     const notCompleted = !completedScenarios.includes(s.id);
@@ -1009,11 +1429,107 @@ function SimulatorsView({ completedScenarios, onScenarioComplete, onFail }: { co
   });
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold tracking-tight text-text-primary">Simuladores Clínicos</h2>
+    <div className="space-y-8">
+      <div>
+         <h2 className="text-2xl font-bold tracking-tight text-text-primary mb-4">Simuladores Clínicos</h2>
+         <p className="text-sm text-text-secondary leading-relaxed">Laboratórios práticos para aprimorar sua tomada de decisão em tempo real.</p>
+      </div>
       
+      {!activeScenario && (
+        <div className="space-y-6">
+          {/* Seção 1: Urgência */}
+          <div className="space-y-4">
+             <h3 className="text-xs font-black uppercase tracking-widest text-[#6366f1] flex items-center gap-2">
+                <Shield className="w-4 h-4" /> Pronto-Socorro
+             </h3>
+             <div 
+               onClick={onManchesterStart}
+               className="relative overflow-hidden bg-gradient-to-br from-indigo-600 to-violet-700 p-6 rounded-[32px] text-white shadow-xl shadow-indigo-500/20 active:scale-95 transition-all cursor-pointer group"
+             >
+               <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:scale-110 transition-transform">
+                 <Shield className="w-24 h-24" />
+               </div>
+               <div className="relative z-10 flex flex-col gap-3">
+                 <div className="flex items-center gap-2">
+                   <span className="bg-white/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md">Urgência</span>
+                 </div>
+                 <div>
+                   <h3 className="text-xl font-black mb-1">Classificação de Risco</h3>
+                   <p className="text-white/80 text-xs">Treine a triagem Manchester sob pressão.</p>
+                 </div>
+               </div>
+             </div>
+          </div>
+
+          {/* Seção 2: Equipamentos UTI */}
+          <div className="space-y-4">
+             <h3 className="text-xs font-black uppercase tracking-widest text-emerald-500 flex items-center gap-2">
+                <HeartPulse className="w-4 h-4" /> UTI e Aparelhos
+             </h3>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div 
+                 onClick={onECGStart}
+                 className="relative overflow-hidden bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-6 rounded-[32px] text-white shadow-xl active:scale-95 transition-all cursor-pointer group border border-emerald-500/20"
+               >
+                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform text-emerald-500">
+                   <HeartPulse className="w-24 h-24" />
+                 </div>
+                 <div className="relative z-10 flex flex-col gap-3">
+                   <div className="flex items-center gap-2">
+                     <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Cardiologia</span>
+                   </div>
+                   <div>
+                     <h3 className="text-xl font-black mb-1">Monitor de ECG</h3>
+                     <p className="text-slate-400 text-xs">Diagnóstico de ritmos cardíacos da UTI.</p>
+                   </div>
+                 </div>
+               </div>
+
+               <div 
+                 onClick={onPumpStart}
+                 className="relative overflow-hidden bg-gradient-to-br from-[#1e2a35] to-[#2d3f50] p-6 rounded-[32px] text-white shadow-xl active:scale-95 transition-all cursor-pointer group border border-blue-500/30"
+               >
+                 <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:scale-110 transition-transform text-blue-400">
+                   <Droplet className="w-24 h-24" />
+                 </div>
+                 <div className="relative z-10 flex flex-col gap-3">
+                   <div className="flex items-center gap-2">
+                     <span className="bg-blue-500/30 text-blue-300 border border-blue-500/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Bomba</span>
+                   </div>
+                   <div>
+                     <h3 className="text-xl font-black mb-1">Infusão Contínua</h3>
+                     <p className="text-blue-100/70 text-xs">Cálculo e programação de BICs.</p>
+                   </div>
+                 </div>
+               </div>
+               
+               <div 
+                 onClick={onABGStart}
+                 className="relative overflow-hidden bg-gradient-to-br from-amber-600 to-orange-800 p-6 rounded-[32px] text-white shadow-xl shadow-orange-500/20 active:scale-95 transition-all cursor-pointer group md:col-span-2"
+               >
+                 <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:scale-110 transition-transform">
+                   <Beaker className="w-24 h-24" />
+                 </div>
+                 <div className="relative z-10 flex flex-col gap-3">
+                   <div className="flex items-center gap-2">
+                     <span className="bg-white/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md">Exames</span>
+                   </div>
+                   <div>
+                     <h3 className="text-xl font-black mb-1">Gasometria Arterial</h3>
+                     <p className="text-white/80 text-xs">Identifique alcalose e acidose instantaneamente.</p>
+                   </div>
+                 </div>
+               </div>
+             </div>
+          </div>
+        </div>
+      )}
+
       {!activeScenario ? (
-        <div className="space-y-4">
+        <div className="space-y-4 pt-6 mt-6 border-t border-border">
+          <h3 className="text-xs font-black uppercase tracking-widest text-text-secondary flex items-center gap-2 mb-4">
+             <Stethoscope className="w-4 h-4" /> Casos Completos Reais
+          </h3>
           {filteredScenarios.slice(0, 2).map(s => (
             <div key={s.id} className="bg-surface p-5 rounded-3xl border border-border shadow-sm group">
               <div className="flex justify-between items-start mb-2">
@@ -1077,47 +1593,73 @@ function SimulatorsView({ completedScenarios, onScenarioComplete, onFail }: { co
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-surface p-6 rounded-3xl border-2 border-accent shadow-2xl space-y-6 relative overflow-hidden"
+          className="bg-surface p-6 rounded-3xl shadow-2xl space-y-6 relative overflow-hidden"
         >
           {/* Stability Bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-border">
-            <motion.div 
-              initial={{ width: '100%' }}
-              animate={{ width: `${stability}%` }}
-              className={`h-full ${stability > 50 ? 'bg-success' : stability > 20 ? 'bg-warning' : 'bg-red-500 shadow-[0_0_10px_#ef4444]'}`}
-            />
-          </div>
+          {activeScenario.useStability && (
+            <>
+              <div className="absolute top-0 left-0 right-0 h-1 bg-border">
+                <motion.div 
+                  initial={{ width: '100%' }}
+                  animate={{ width: `${stability}%` }}
+                  className={`h-full ${stability > 50 ? 'bg-success' : stability > 20 ? 'bg-warning' : 'bg-red-500 shadow-[0_0_10px_#ef4444]'}`}
+                />
+              </div>
 
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-2">
-               <Activity className={`w-4 h-4 ${stability > 50 ? 'text-success' : 'text-red-500 animate-pulse'}`} />
-               <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary">Estabilidade: {stability}%</span>
-            </div>
-            <div className="flex items-center gap-2 text-warning">
-              <Timer className="w-4 h-4" />
-              <span className="text-xs font-bold tabular-nums">{Math.floor(simulationTime / 60)}:{(simulationTime % 60).toString().padStart(2, '0')}</span>
-            </div>
-          </div>
+              <div className="flex justify-between items-center mb-2">
+                <div className="flex items-center gap-2">
+                   <Activity className={`w-4 h-4 ${stability > 50 ? 'text-success' : 'text-red-500 animate-pulse'}`} />
+                   <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary">Estabilidade: {stability}%</span>
+                </div>
+                <div className="flex items-center gap-2 text-warning">
+                  <Timer className="w-4 h-4" />
+                  <span className="text-xs font-bold tabular-nums">{Math.floor(simulationTime / 60)}:{(simulationTime % 60).toString().padStart(2, '0')}</span>
+                </div>
+              </div>
+            </>
+          )}
           
-          <div className="space-y-4">
+          <div className={`${activeScenario.useStability ? 'space-y-4' : 'pt-4 space-y-4'}`}>
             <h3 className="text-xl font-black leading-tight text-text-primary">{currentStep?.description}</h3>
             <div className="space-y-3">
               {currentStep?.options.map((opt, idx) => (
                 <button
                   key={idx}
                   onClick={() => {
-                    if (!opt.isCorrect) {
-                      const penalty = 25;
-                      const newStability = Math.max(0, stability - penalty);
-                      setStability(newStability);
-                      if (newStability <= 0) {
-                        setResult({ feedback: "A estabilidade do paciente zerou devido a condutas inadequadas.", isCorrect: false });
-                        return;
+                    const isCorrect = opt.isCorrect;
+                    
+                    if (!isCorrect) {
+                      if (activeScenario.useStability) {
+                        const penalty = 30; // 30% penalty
+                        const newStability = Math.max(0, stability - penalty);
+                        setStability(newStability);
+                        
+                        if (newStability <= 0) {
+                          setResult({ feedback: "O paciente entrou em colapso devido a condutas inadequadas.", isCorrect: false });
+                          playSound('GAMEOVER');
+                          return;
+                        }
+
+                        // Se não for um erro fatal (isEnding), dá outra chance no mesmo passo
+                        if (!opt.isEnding) {
+                           setShowNotification({
+                             show: true,
+                             title: 'Conduta Inadequada',
+                             subtitle: 'A estabilidade do paciente caiu, mas você ainda pode agir!',
+                             type: 'error'
+                           });
+                           setTimeout(() => setShowNotification(null), 3000);
+                           playSound('WRONG');
+                           triggerHaptic('error');
+                           return; 
+                        }
                       }
                     }
 
                     if (opt.isEnding || !opt.nextStepId) {
-                      setResult({ feedback: opt.feedback, isCorrect: opt.isCorrect });
+                      setResult({ feedback: opt.feedback, isCorrect: isCorrect });
+                      if (isCorrect) playSound('CORRECT');
+                      else playSound('WRONG');
                     } else {
                       setCurrentStepId(opt.nextStepId);
                     }
@@ -1136,7 +1678,35 @@ function SimulatorsView({ completedScenarios, onScenarioComplete, onFail }: { co
   );
 }
 
-function ProfileView({ xp, level, name, lostPatients, onReset, completedLessons, unlockedBadges }: { xp: number, level: number, name: string, lostPatients: number, onReset?: () => void, completedLessons: string[], unlockedBadges: string[] }) {
+function ProfileView({ 
+  xp, 
+  level, 
+  name, 
+  lostPatients, 
+  onReset, 
+  onExport,
+  onImport,
+  onToggleSounds,
+  soundsEnabled,
+  onToggleHaptics,
+  hapticsEnabled,
+  completedLessons, 
+  unlockedBadges 
+}: { 
+  xp: number, 
+  level: number, 
+  name: string, 
+  lostPatients: number, 
+  onReset?: () => void, 
+  onExport: () => void,
+  onImport: (e: React.ChangeEvent<HTMLInputElement>) => void,
+  onToggleSounds: () => void,
+  soundsEnabled: boolean,
+  onToggleHaptics: () => void,
+  hapticsEnabled: boolean,
+  completedLessons: string[], 
+  unlockedBadges: string[] 
+}) {
   const stats = [
     { label: 'Total XP', value: xp, icon: Zap },
     { label: 'Aulas Lidas', value: completedLessons.length, icon: ShieldCheck },
@@ -1192,7 +1762,7 @@ function ProfileView({ xp, level, name, lostPatients, onReset, completedLessons,
       <section>
         <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary mb-3 px-1">Conquistas Recentes</p>
         <div className="grid grid-cols-2 gap-3">
-          {BADGES.map(b => {
+          {BADGES.slice(0, 4).map(b => {
              const isUnlocked = unlockedBadges.includes(b.id);
              return (
               <div key={b.id} className={`p-4 rounded-2xl border flex flex-col items-center text-center gap-2 ${isUnlocked ? 'bg-surface border-accent/30 shadow-sm opacity-100' : 'bg-bg border-border opacity-50'}`}>
@@ -1204,6 +1774,86 @@ function ProfileView({ xp, level, name, lostPatients, onReset, completedLessons,
               </div>
              );
           })}
+        </div>
+      </section>
+
+      <section>
+        <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary mb-3 px-1">Preferências</p>
+        <button 
+          onClick={onToggleSounds}
+          className="w-full flex items-center justify-between p-4 bg-surface border border-border rounded-2xl hover:border-accent transition-all group"
+        >
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 ${soundsEnabled ? 'bg-accent/10 text-accent' : 'bg-text-secondary/10 text-text-secondary'} rounded-xl flex items-center justify-center`}>
+              {soundsEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-bold text-text-primary">Efeitos Sonoros</p>
+              <p className="text-[10px] text-text-secondary">{soundsEnabled ? 'Sons ativos para uma melhor imersão' : 'Sons desativados'}</p>
+            </div>
+          </div>
+          <div className={`w-10 h-6 rounded-full relative transition-colors ${soundsEnabled ? 'bg-accent' : 'bg-border'}`}>
+            <motion.div 
+              animate={{ x: soundsEnabled ? 18 : 2 }}
+              className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm"
+            />
+          </div>
+        </button>
+
+        <button 
+          onClick={onToggleHaptics}
+          className="w-full flex items-center justify-between p-4 bg-surface border border-border rounded-2xl hover:border-accent transition-all group"
+        >
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 ${hapticsEnabled ? 'bg-accent/10 text-accent' : 'bg-text-secondary/10 text-text-secondary'} rounded-xl flex items-center justify-center`}>
+              <Smartphone className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-bold text-text-primary">Resposta Tátil</p>
+              <p className="text-[10px] text-text-secondary">{hapticsEnabled ? 'Sentir vibrações ao interagir' : 'Vibrações desativadas'}</p>
+            </div>
+          </div>
+          <div className={`w-10 h-6 rounded-full relative transition-colors ${hapticsEnabled ? 'bg-accent' : 'bg-border'}`}>
+            <motion.div 
+              animate={{ x: hapticsEnabled ? 18 : 2 }}
+              className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm"
+            />
+          </div>
+        </button>
+      </section>
+
+      <section>
+        <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary mb-3 px-1">Gestão de Dados</p>
+        <div className="space-y-3">
+          <button 
+            onClick={onExport}
+            className="w-full flex items-center justify-between p-4 bg-surface border border-border rounded-2xl hover:border-accent transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center text-accent">
+                <Download className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-bold text-text-primary">Exportar Backup</p>
+                <p className="text-[10px] text-text-secondary">Salvar progresso em um arquivo JSON</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-text-secondary group-hover:text-accent group-hover:translate-x-1 transition-all" />
+          </button>
+
+          <label className="w-full flex items-center justify-between p-4 bg-surface border border-border rounded-2xl hover:border-accent transition-all group cursor-pointer">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-success/10 rounded-xl flex items-center justify-center text-success">
+                <Upload className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-bold text-text-primary">Restaurar Backup</p>
+                <p className="text-[10px] text-text-secondary">Carregar dados de um arquivo salvo</p>
+              </div>
+            </div>
+            <input type="file" accept=".json" onChange={onImport} className="hidden" />
+            <ChevronRight className="w-4 h-4 text-text-secondary group-hover:text-success group-hover:translate-x-1 transition-all" />
+          </label>
         </div>
       </section>
 
