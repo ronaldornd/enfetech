@@ -230,7 +230,9 @@ export default function ManchesterSim({ onClose, onComplete, playSound, triggerH
                 {showFeedback ? <Shield className="w-12 h-12" /> : <X className="w-12 h-12" />}
               </div>
               <h3 className="text-2xl font-black mb-2">{showFeedback ? 'Classificação Correta!' : 'Falha na Triagem!'}</h3>
-              <p className="text-white/80 leading-relaxed font-medium">{currentCase.feedback}</p>
+              <p className="text-white/80 leading-relaxed font-medium">
+                {showFeedback ? currentCase.feedback : "Triagem crítica rejeitada pelo sistema! O risco associado não foi previsto. Retorne à Dashboard e revise os Protocolos na Base de Conhecimento."}
+              </p>
             </div>
           </motion.div>
         )}

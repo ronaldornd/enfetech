@@ -127,7 +127,7 @@ export default function ECGSim({ onClose, onComplete, playSound, triggerHaptic }
       setCombo(1);
       playSound('WRONG');
       triggerHaptic('error');
-      setFeedback({ isCorrect: false, text: `Erro crítico. O ritmo era ${formatRhythm(currentCase.rhythm)}.` });
+      setFeedback({ isCorrect: false, text: "Interpretação vetorial letal! Conduta equivocada. Revise a seção 'Arritmias Cardíacas' na sua biblioteca de Flashcards." });
     }
   };
 

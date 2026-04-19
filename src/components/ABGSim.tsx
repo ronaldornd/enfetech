@@ -136,7 +136,7 @@ export default function ABGSim({ onClose, onComplete, playSound, triggerHaptic }
       triggerHaptic('success');
       setFeedback({ isCorrect: true, text: `Correto! +${earnedXP} XP. Distúrbio ${currentCase.comp.toUpperCase()}.` });
     } else {
-      handleFailure(`Incorreto. A gasometria apresenta uma ${formatDiag(currentCase.primaryDiag)} ${currentCase.comp}.`);
+      handleFailure(`Diagnóstico laboratorial letal! Interpretação trocada causou iatrogenia aguda. Revise a "Pílula de Gasometria" antes de assumir novos plantões.`);
     }
   };
 
