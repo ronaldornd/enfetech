@@ -59,14 +59,14 @@ export default function ManchesterSim({ onClose, onComplete, playSound, triggerH
 
     if (isCorrect) {
       triggerHaptic('success');
-      playSound('SUCCESS');
+      playSound('CORRECT');
       const baseXP = 50;
       const comboBonus = combo * 10;
       setScore(prev => prev + baseXP + comboBonus);
       setCombo(prev => prev + 1);
     } else {
       triggerHaptic('error');
-      playSound('ERROR');
+      playSound('WRONG');
       setLives(prev => prev - 1);
       setCombo(0);
       if (lives <= 1) {

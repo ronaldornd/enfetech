@@ -120,7 +120,7 @@ export default function ABGSim({ onClose, onComplete, playSound, triggerHaptic }
   const handleFailure = (msg: string) => {
     setLives(l => l - 1);
     setCombo(1);
-    playSound('ERROR');
+    playSound('WRONG');
     triggerHaptic('error');
     setFeedback({ isCorrect: false, text: msg });
   };
@@ -132,7 +132,7 @@ export default function ABGSim({ onClose, onComplete, playSound, triggerHaptic }
       const earnedXP = 10 * combo;
       setScore(s => s + earnedXP);
       setCombo(c => Math.min(c + 1, 5));
-      playSound('SUCCESS');
+      playSound('CORRECT');
       triggerHaptic('success');
       setFeedback({ isCorrect: true, text: `Correto! +${earnedXP} XP. Distúrbio ${currentCase.comp.toUpperCase()}.` });
     } else {

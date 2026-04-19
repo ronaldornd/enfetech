@@ -97,12 +97,12 @@ export default function PumpSim({ onClose, onComplete, playSound, triggerHaptic 
 
     if (isRateCorrect && isVtbiCorrect) {
       setScore(s => s + 20);
-      playSound('SUCCESS');
+      playSound('CORRECT');
       triggerHaptic('success');
       setFeedback({ isCorrect: true, text: "Bomba programada com sucesso! Infusão rolando segura." });
     } else {
       setLives(l => l - 1);
-      playSound('ERROR');
+      playSound('WRONG');
       triggerHaptic('error');
       setFeedback({ 
         isCorrect: false, 
