@@ -153,7 +153,9 @@ export default function LessonViewer({
                     const term = href.replace('dict://', '');
                     return (
                       <button 
+                        type="button"
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           haptics.light();
                           onTermClick?.(term);
