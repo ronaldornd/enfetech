@@ -101,8 +101,11 @@ export default function PumpSim({ onClose, onComplete, playSound, triggerHaptic 
       triggerHaptic('success');
       setFeedback({ isCorrect: true, text: "Bomba programada com sucesso! Infusão rolando segura." });
     } else {
-      setLives(l => l - 1);
-      playSound('WRONG');
+      setLives(l => {
+        if (l <= 1) playSound('GAMEOVER');
+        else playSound('WRONG');
+        return l - 1;
+      });
       triggerHaptic('error');
       setFeedback({ 
         isCorrect: false, 

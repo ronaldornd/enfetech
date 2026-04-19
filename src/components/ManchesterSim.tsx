@@ -66,8 +66,11 @@ export default function ManchesterSim({ onClose, onComplete, playSound, triggerH
       setCombo(prev => prev + 1);
     } else {
       triggerHaptic('error');
-      playSound('WRONG');
-      setLives(prev => prev - 1);
+      setLives(prev => {
+        if (prev <= 1) playSound('GAMEOVER');
+        else playSound('WRONG');
+        return prev - 1;
+      });
       setCombo(0);
       if (lives <= 1) {
         setTimeout(() => setGameOver(true), 1500);

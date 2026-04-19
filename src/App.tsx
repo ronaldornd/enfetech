@@ -115,7 +115,7 @@ const ModuleCard = ({ module, onClick }: { module: Module; onClick: () => void; 
       whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => {
-        triggerHaptic('light');
+        haptics.light();
         onClick();
       }}
       className="w-full bg-surface p-5 rounded-[32px] border border-border flex items-center gap-5 text-left transition-all hover:bg-surface-hover hover:shadow-xl hover:shadow-accent/5 group relative overflow-hidden"

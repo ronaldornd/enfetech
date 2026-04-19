@@ -123,9 +123,12 @@ export default function ECGSim({ onClose, onComplete, playSound, triggerHaptic }
       triggerHaptic('success');
       setFeedback({ isCorrect: true, text: `Preciso! +${earnedXP} XP. Ritmo: ${formatRhythm(currentCase.rhythm)}` });
     } else {
-      setLives(l => l - 1);
+      setLives(l => {
+        if (l <= 1) playSound('GAMEOVER');
+        else playSound('WRONG');
+        return l - 1;
+      });
       setCombo(1);
-      playSound('WRONG');
       triggerHaptic('error');
       setFeedback({ isCorrect: false, text: "Interpretação vetorial letal! Conduta equivocada. Revise a seção 'Arritmias Cardíacas' na sua biblioteca de Flashcards." });
     }

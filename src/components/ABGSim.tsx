@@ -118,9 +118,12 @@ export default function ABGSim({ onClose, onComplete, playSound, triggerHaptic }
   }, [lives, currentCase, feedback]);
 
   const handleFailure = (msg: string) => {
-    setLives(l => l - 1);
+    setLives(l => {
+      if (l <= 1) playSound('GAMEOVER');
+      else playSound('WRONG');
+      return l - 1;
+    });
     setCombo(1);
-    playSound('WRONG');
     triggerHaptic('error');
     setFeedback({ isCorrect: false, text: msg });
   };
