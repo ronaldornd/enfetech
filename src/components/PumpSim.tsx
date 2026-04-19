@@ -106,7 +106,7 @@ export default function PumpSim({ onClose, onComplete, playSound, triggerHaptic 
       triggerHaptic('error');
       setFeedback({ 
         isCorrect: false, 
-        text: `Erro de medicação! O volume correto é ${currentCase.volume}mL e a taxa é ${currentCase.targetRate}mL/h.` 
+        text: 'Alarme de Infusão! Erro crítico de dosagem detectado. Retorne ao menu e revise a "Pílula de Cálculo de Gotejamento e BIC" na aba de Farmacologia.' 
       });
     }
   };
