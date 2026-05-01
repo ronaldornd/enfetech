@@ -6,12 +6,11 @@ on:
     tags:
       - 'v*'
 
-env:
-  ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
-
 jobs:
   build-android:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
     steps:
       - name: Checkout
         uses: actions/checkout@v4
