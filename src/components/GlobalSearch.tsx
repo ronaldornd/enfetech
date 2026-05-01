@@ -11,12 +11,12 @@ interface SearchResult {
   category?: string;
 }
 
-export default function GlobalSearch({ 
-  onClose, 
-  onSelectResult 
-}: { 
-  onClose: () => void, 
-  onSelectResult: (type: SearchResult['type'], id: string, extra?: any) => void 
+export default function GlobalSearch({
+  onClose,
+  onSelectResult
+}: {
+  onClose: () => void,
+  onSelectResult: (type: SearchResult['type'], id: string, extra?: any) => void
 }) {
   const [query, setQuery] = useState('');
 
@@ -84,7 +84,7 @@ export default function GlobalSearch({
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -94,7 +94,7 @@ export default function GlobalSearch({
         <div className="flex items-center gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary" />
-            <input 
+            <input
               autoFocus
               type="text"
               placeholder="Pesquisar em todo o EnfeTech..."
