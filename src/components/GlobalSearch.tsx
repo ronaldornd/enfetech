@@ -56,7 +56,7 @@ export default function GlobalSearch({
 
     // POPs
     POPS.forEach(p => {
-      const stepMatch = p.steps.some(s => s.toLowerCase().includes(q));
+      const stepMatch = p.steps.some(s => s.text.toLowerCase().includes(q));
       if (p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || stepMatch) {
         matches.push({ type: 'pop', id: p.id, title: p.title, subtitle: p.category });
       }
